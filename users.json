@@ -1,0 +1,32 @@
+[
+    {
+        "user_id": 1,
+        "username": "gb",
+        "email": "gabriel114w@gmail.com",
+        "password": "3715",
+        "tasks": [
+            {
+                "title": "Beber água",
+                "description": "",
+                "due_date": "16:19",
+                "type": "daily",
+                "completed": false
+            }
+        ]
+    },
+    {
+        "user_id": 2,
+        "username": "iyuc",
+        "email": "rogerio@gmail.com",
+        "password": "1234",
+        "tasks": [
+            {
+                "title": "gvovg",
+                "description": "",
+                "due_date": "16:46",
+                "type": "daily",
+                "completed": false
+            }
+        ]
+    }
+]
