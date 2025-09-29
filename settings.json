@@ -1,0 +1,11 @@
+{
+    "theme": {
+        "primary_color": "#d7c4f3",
+        "background_color": "#f8f7fc",
+        "secondary_color": "#aacfcf",
+        "text_color": "#FFFFFF",
+        "success_color": "#b7e4c7",
+        "warning_color": "#fff3b0",
+        "error_color": "#f2b5c4"
+    }
+}
