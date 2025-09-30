@@ -1,6 +1,9 @@
 from supabase import create_client
+import os
 
-SUPABASE_URL = "https://rnhaghcygghooseuaaeen.supabase.com"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuaGFnaGN5Z2hob29zZXVhYWVuIiwicm9sZSI6ImFub25lIiwiaWF0IjoxNzU5MjMzNjQyLCJleHAiOjIwNzQ4MDk2NDJ9.fQpaQ_TY9MVjOy-KBWxim91rmL9ZRkebXkKY8V5I7hg"
+# Lê as credenciais do Supabase a partir das variáveis de ambiente configuradas no Streamlit Cloud
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+# Cria o cliente Supabase
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
