@@ -8,29 +8,18 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-def load_data(table_name, filters=None):
-    """Carrega dados do Supabase"""
-    try:
-        query = supabase.table(table_name).select("*")
-        if filters:
-            for key, value in filters.items():
-                query = query.eq(key, value)
-        response = query.execute()
-        return response.data or []
-    except Exception as e:
-        print(f"Erro ao carregar dados da tabela {table_name}: {e}")
-        return []
+def get_user_by_email(email):
+    resp = supabase.table("users").select("*").eq("email", email).execute()
+    return resp.data[0] if resp.data else None
 
-
-def save_data(table_name, data):
-    """Salva dados no Supabase"""
-    try:
-        response = supabase.table(table_name).insert(data).execute()
-        return response.data
-    except Exception as e:
-        print(f"Erro ao salvar dados na tabela {table_name}: {e}")
-        return None
-
+def create_user(username, email, password):
+    resp = supabase.table("users").insert({
+        "username": username,
+        "email": email,
+        "password": password,
+        "theme_settings": {}
+    }).execute()
+    return resp.data[0] if resp.data else None
 
 def send_task_notification(title, desc, app_context=None):
     """Envia notificação de tarefa (simulação console)"""
