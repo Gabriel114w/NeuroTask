@@ -5,11 +5,23 @@ from supabase import create_client
 # 🔗 Conexão global com Supabase
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("⚠️ SUPABASE_URL e SUPABASE_KEY não estão configurados!")
+
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
+# =============================
+# USUÁRIOS
+# =============================
+
 def get_user_by_email(email):
     resp = supabase.table("users").select("*").eq("email", email).execute()
+    return resp.data[0] if resp.data else None
+
+def get_user_by_username(username):
+    resp = supabase.table("users").select("*").eq("username", username).execute()
     return resp.data[0] if resp.data else None
 
 def create_user(username, email, password):
@@ -20,6 +32,42 @@ def create_user(username, email, password):
         "theme_settings": {}
     }).execute()
     return resp.data[0] if resp.data else None
+
+def update_user(user_id, updates: dict):
+    resp = supabase.table("users").update(updates).eq("user_id", user_id).execute()
+    return resp.data[0] if resp.data else None
+
+
+# =============================
+# TAREFAS
+# =============================
+
+def get_tasks(user_id):
+    resp = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    return resp.data if resp.data else []
+
+def add_task(user_id, title, description="", due_date="", task_type="single", completed=False):
+    resp = supabase.table("tasks").insert({
+        "user_id": user_id,
+        "title": title,
+        "description": description,
+        "due_date": due_date,
+        "type": task_type,
+        "completed": completed
+    }).execute()
+    return resp.data[0] if resp.data else None
+
+def update_task(task_id, updates: dict):
+    resp = supabase.table("tasks").update(updates).eq("task_id", task_id).execute()
+    return resp.data[0] if resp.data else None
+
+def delete_task(task_id):
+    supabase.table("tasks").delete().eq("task_id", task_id).execute()
+
+
+# =============================
+# UTILITÁRIOS
+# =============================
 
 def send_task_notification(title, desc, app_context=None):
     """Envia notificação de tarefa (simulação console)"""
@@ -34,13 +82,11 @@ def send_task_notification(title, desc, app_context=None):
         return notification_text
     return None
 
-
 def validate_email(email):
     """Validação simples de email"""
     import re
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
-
 
 def format_task_time(time_str):
     """Formata hora para exibição"""
@@ -51,7 +97,6 @@ def format_task_time(time_str):
         return time_obj.strftime("%I:%M %p")
     except ValueError:
         return time_str
-
 
 def get_task_priority(task):
     """Determina prioridade da tarefa"""
@@ -76,13 +121,12 @@ def get_task_priority(task):
     except ValueError:
         return 2
 
-
 def export_user_tasks(user_id, format_type="json"):
     """Exporta tarefas do usuário direto do BD"""
-    tasks = load_data("tasks", {"user_id": user_id})
+    import json
+    tasks = get_tasks(user_id)
     
     if format_type == "json":
-        import json
         return json.dumps(tasks, indent=2, ensure_ascii=False)
     elif format_type == "text":
         output = f"Tasks for user {user_id}:\n\n"
