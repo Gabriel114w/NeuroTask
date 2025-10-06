@@ -1,5 +1,5 @@
 import os
-from supabase import create_client
+from supabase import create_client, Client
 from datetime import datetime
 
 # 🔗 Conexão global com Supabase
