@@ -11,28 +11,53 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# ==========================================================
 # 🧱 Funções CRUD de usuário
+# ==========================================================
+
 def create_user(username, email, password):
+    """Cria um novo usuário"""
     data = {"username": username, "email": email, "password": password}
-    return supabase.table("users").insert(data).execute()
+    result = supabase.table("users").insert(data).execute()
+    return result.data[0] if result.data else None
+
 
 def get_user_by_email(email):
-    return supabase.table("users").select("*").eq("email", email).execute()
+    """Retorna o usuário pelo email (ou None)"""
+    result = supabase.table("users").select("*").eq("email", email).execute()
+    return result.data[0] if result.data else None
+
 
 def get_user_by_username(username):
-    return supabase.table("users").select("*").eq("username", username).execute()
+    """Retorna o usuário pelo nome de usuário (ou None)"""
+    result = supabase.table("users").select("*").eq("username", username).execute()
+    return result.data[0] if result.data else None
+
 
 def update_user(email, updates):
-    return supabase.table("users").update(updates).eq("email", email).execute()
+    """Atualiza informações do usuário"""
+    result = supabase.table("users").update(updates).eq("email", email).execute()
+    return result.data[0] if result.data else None
+
 
 def delete_user(email):
-    return supabase.table("users").delete().eq("email", email).execute()
+    """Deleta um usuário"""
+    result = supabase.table("users").delete().eq("email", email).execute()
+    return result.data
 
+
+# ==========================================================
 # 🧩 Funções CRUD de tarefas
+# ==========================================================
+
 def get_tasks(user_id):
-    return supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    """Retorna todas as tarefas de um usuário"""
+    result = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+    return result.data or []
+
 
 def add_task(user_id, title, description="", due_date="", type="single"):
+    """Adiciona uma nova tarefa"""
     data = {
         "user_id": user_id,
         "title": title,
@@ -41,10 +66,27 @@ def add_task(user_id, title, description="", due_date="", type="single"):
         "type": type,
         "completed": False
     }
-    return supabase.table("tasks").insert(data).execute()
+    result = supabase.table("tasks").insert(data).execute()
+    return result.data[0] if result.data else None
+
 
 def update_task(task_id, updates):
-    return supabase.table("tasks").update(updates).eq("id", task_id).execute()
+    """Atualiza uma tarefa existente"""
+    result = supabase.table("tasks").update(updates).eq("id", task_id).execute()
+    return result.data[0] if result.data else None
+
 
 def delete_task(task_id):
-    return supabase.table("tasks").delete().eq("id", task_id).execute()
+    """Deleta uma tarefa"""
+    result = supabase.table("tasks").delete().eq("id", task_id).execute()
+    return result.data
+
+
+# ==========================================================
+# 🔔 Notificações (placeholder)
+# ==========================================================
+
+def send_task_notification(title, desc, app_context=None):
+    """Envia uma notificação simples (placeholder para logs)"""
+    if title:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Lembrete: {title} - {desc}")
