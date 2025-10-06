@@ -1,5 +1,5 @@
 streamlit
 pandas
 bcrypt
-supabase-py
+supabase
 python-dotenv
