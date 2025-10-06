@@ -1,10 +1,10 @@
-import streamlit as st
+import os
 import time
 from datetime import datetime
+import streamlit as st
 from utils import (
     get_user_by_email, get_user_by_username, create_user, update_user,
-    get_tasks, add_task, update_task, delete_task,
-    send_task_notification
+    get_tasks, add_task, update_task, delete_task
 )
 
 # =============================
@@ -18,6 +18,12 @@ if 'task_to_edit' not in st.session_state:
     st.session_state.task_to_edit = None
 if 'show_task_form' not in st.session_state:
     st.session_state.show_task_form = False
+if 'show_settings' not in st.session_state:
+    st.session_state.show_settings = False
+if 'show_profile' not in st.session_state:
+    st.session_state.show_profile = False
+if 'menu_open' not in st.session_state:
+    st.session_state.menu_open = False
 if 'theme_settings' not in st.session_state:
     st.session_state.theme_settings = {
         "primary_color": "#FFD6BA",
@@ -35,6 +41,11 @@ st.set_page_config(page_title="NeuroTask", page_icon="🧠", layout="centered")
 # Funções auxiliares
 # =============================
 
+def carregar_tema_usuario():
+    """Carrega tema salvo do usuário"""
+    if st.session_state.current_user and st.session_state.current_user.get("theme_settings"):
+        st.session_state.theme_settings = st.session_state.current_user["theme_settings"]
+
 def verificar_notificacoes():
     """Verifica tarefas com horário atual"""
     if not st.session_state.current_user:
@@ -51,7 +62,6 @@ def verificar_notificacoes():
             })
     return notificacoes
 
-
 def mostrar_notificacao_popup(notificacao):
     """Mostra notificação popup"""
     st.markdown(f"""
@@ -63,11 +73,13 @@ def mostrar_notificacao_popup(notificacao):
     </div>
     """, unsafe_allow_html=True)
 
-
-def carregar_tema_usuario():
-    """Carrega tema salvo do usuário"""
-    if st.session_state.current_user.get("theme_settings"):
-        st.session_state.theme_settings = st.session_state.current_user["theme_settings"]
+def validar_horario(hora):
+    """Valida formato HH:MM"""
+    try:
+        h, m = map(int, hora.split(":"))
+        return 0 <= h <= 23 and 0 <= m <= 59
+    except:
+        return False
 
 # =============================
 # Telas
@@ -76,17 +88,14 @@ def carregar_tema_usuario():
 def tela_login():
     st.title("NeuroTask 🧠")
     st.subheader("Entre na sua conta")
-
     with st.form("login_form"):
         identificador = st.text_input("Email ou Nome de Usuário")
         senha = st.text_input("Senha", type="password")
         botao_login = st.form_submit_button("LOGIN")
-
         if botao_login:
             if not identificador or not senha:
                 st.error("Preencha todos os campos")
                 return
-
             user = get_user_by_email(identificador.lower()) or get_user_by_username(identificador)
             if user and user["password"] == senha:
                 st.session_state.current_user = user
@@ -96,23 +105,18 @@ def tela_login():
                 st.rerun()
             else:
                 st.error("Credenciais inválidas")
-
     if st.button("Não tem conta? Registre-se"):
         st.session_state.current_screen = "register"
         st.rerun()
 
-
 def tela_registro():
     st.title("Criar Conta 🧠")
-
     with st.form("register_form"):
         usuario = st.text_input("Nome de Usuário")
         email = st.text_input("Email")
         senha = st.text_input("Senha", type="password")
         confirmar_senha = st.text_input("Confirmar Senha", type="password")
-
         botao_registro = st.form_submit_button("REGISTRAR")
-
         if botao_registro:
             if not all([usuario, email, senha, confirmar_senha]):
                 st.error("Todos os campos são obrigatórios")
@@ -126,20 +130,16 @@ def tela_registro():
             if get_user_by_username(usuario):
                 st.error("Nome de usuário já em uso")
                 return
-
-            novo = create_user(usuario, email.lower(), senha)
-            if novo:
-                st.success("Registro bem-sucedido! Faça login.")
-                st.session_state.current_screen = "login"
-                st.rerun()
-
+            create_user(usuario, email.lower(), senha)
+            st.success("Registro bem-sucedido! Faça login.")
+            st.session_state.current_screen = "login"
+            st.rerun()
     if st.button("Já tem conta? Faça login"):
         st.session_state.current_screen = "login"
         st.rerun()
 
-
 def mostrar_menu_navegacao():
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns([3,1])
     with col1:
         st.write(f"Olá, **{st.session_state.current_user.get('username', 'Usuário')}**! 👋")
     with col2:
@@ -148,19 +148,16 @@ def mostrar_menu_navegacao():
             st.session_state.current_screen = "login"
             st.rerun()
 
-
 def tela_tarefas():
     mostrar_menu_navegacao()
     st.markdown("---")
     st.title("📋 Minhas Tarefas")
-
     tasks = get_tasks(st.session_state.current_user["id"])
     if not tasks:
         st.info("Nenhuma tarefa encontrada. Adicione sua primeira!")
         return
-
     for tarefa in sorted(tasks, key=lambda t: t.get("due_date", "99:99")):
-        col1, col2, col3, col4 = st.columns([0.5, 3, 1, 0.5])
+        col1, col2, col3, col4 = st.columns([0.5,3,1,0.5])
         with col1:
             concluida = st.checkbox("✔", value=tarefa.get("completed", False), key=f"c_{tarefa['id']}")
             if concluida != tarefa.get("completed", False):
@@ -184,7 +181,6 @@ def tela_tarefas():
                 st.success("Tarefa excluída!")
                 st.rerun()
 
-
 def mostrar_dialogo_tarefa():
     tarefa = st.session_state.task_to_edit or {}
     with st.form("task_form"):
@@ -192,11 +188,15 @@ def mostrar_dialogo_tarefa():
         descricao = st.text_area("Descrição", value=tarefa.get("description", ""))
         horario = st.text_input("Horário (HH:MM)", value=tarefa.get("due_date", ""))
         diaria = st.checkbox("Tarefa Diária", value=tarefa.get("type") == "daily")
-
         salvar = st.form_submit_button("💾 Salvar")
         cancelar = st.form_submit_button("❌ Cancelar")
-
         if salvar:
+            if not titulo.strip():
+                st.error("Título obrigatório")
+                return
+            if horario.strip() and not validar_horario(horario.strip()):
+                st.error("Formato inválido. Use HH:MM")
+                return
             dados = {
                 "title": titulo.strip(),
                 "description": descricao.strip(),
@@ -212,7 +212,6 @@ def mostrar_dialogo_tarefa():
             st.session_state.show_task_form = False
             st.success("Tarefa salva com sucesso!")
             st.rerun()
-
         if cancelar:
             st.session_state.task_to_edit = None
             st.session_state.show_task_form = False
@@ -221,6 +220,7 @@ def mostrar_dialogo_tarefa():
 # =============================
 # Main
 # =============================
+
 def main():
     if st.session_state.current_user:
         notificacoes = verificar_notificacoes()
