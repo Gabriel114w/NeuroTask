@@ -1,6 +1,5 @@
 import streamlit as st
 import time
-import os
 from datetime import datetime
 from utils import (
     get_user_by_email, get_user_by_username, create_user, update_user,
@@ -8,7 +7,9 @@ from utils import (
     send_task_notification
 )
 
-# Inicializar o estado da sessão
+# =============================
+# Sessão e tema
+# =============================
 if 'current_user' not in st.session_state:
     st.session_state.current_user = None
 if 'current_screen' not in st.session_state:
@@ -17,33 +18,18 @@ if 'task_to_edit' not in st.session_state:
     st.session_state.task_to_edit = None
 if 'show_task_form' not in st.session_state:
     st.session_state.show_task_form = False
-if 'show_settings' not in st.session_state:
-    st.session_state.show_settings = False
-if 'last_check_date' not in st.session_state:
-    st.session_state.last_check_date = datetime.now().date()
 if 'theme_settings' not in st.session_state:
     st.session_state.theme_settings = {
         "primary_color": "#FFD6BA",
         "background_color": "#FFFFFF",
         "secondary_color": "#A1C3D1",
-        "text_color": "#FFFFFF",
+        "text_color": "#333333",
         "success_color": "#A8D5BA",
         "warning_color": "#FFE7A0",
         "error_color": "#F4A6A6"
     }
-if 'show_profile' not in st.session_state:
-    st.session_state.show_profile = False
-if 'menu_open' not in st.session_state:
-    st.session_state.menu_open = False
 
-
-# Configuração da página
-st.set_page_config(
-    page_title="NeuroTask - Organizador de Tarefas para TDAH",
-    page_icon="🧠",
-    layout="centered"
-)
-
+st.set_page_config(page_title="NeuroTask", page_icon="🧠", layout="centered")
 
 # =============================
 # Funções auxiliares
@@ -53,21 +39,16 @@ def verificar_notificacoes():
     """Verifica tarefas com horário atual"""
     if not st.session_state.current_user:
         return []
-
     agora = datetime.now()
     hora_atual = agora.strftime("%H:%M")
     notificacoes = []
-
-    tasks = get_tasks(st.session_state.current_user["user_id"])
+    tasks = get_tasks(st.session_state.current_user["id"])
     for tarefa in tasks:
-        if (tarefa.get("due_date") == hora_atual and
-            not tarefa.get("completed", False)):
-
+        if tarefa.get("due_date") == hora_atual and not tarefa.get("completed", False):
             notificacoes.append({
                 "title": tarefa.get("title", "Tarefa"),
                 "description": tarefa.get("description", "Hora de começar!")
             })
-
     return notificacoes
 
 
@@ -85,9 +66,8 @@ def mostrar_notificacao_popup(notificacao):
 
 def carregar_tema_usuario():
     """Carrega tema salvo do usuário"""
-    if st.session_state.current_user and st.session_state.current_user.get("theme_settings"):
+    if st.session_state.current_user.get("theme_settings"):
         st.session_state.theme_settings = st.session_state.current_user["theme_settings"]
-
 
 # =============================
 # Telas
@@ -107,11 +87,9 @@ def tela_login():
                 st.error("Preencha todos os campos")
                 return
 
-            usuario = (get_user_by_email(identificador.lower())
-                       or get_user_by_username(identificador))
-
-            if usuario and usuario["password"] == senha:
-                st.session_state.current_user = usuario
+            user = get_user_by_email(identificador.lower()) or get_user_by_username(identificador)
+            if user and user["password"] == senha:
+                st.session_state.current_user = user
                 carregar_tema_usuario()
                 st.session_state.current_screen = "task_list"
                 st.success("Login realizado com sucesso!")
@@ -119,14 +97,13 @@ def tela_login():
             else:
                 st.error("Credenciais inválidas")
 
-    if st.button("Não tem conta ? Registre-se"):
+    if st.button("Não tem conta? Registre-se"):
         st.session_state.current_screen = "register"
         st.rerun()
 
 
 def tela_registro():
-    st.title("NeuroTask 🧠")
-    st.subheader("Criar Conta")
+    st.title("Criar Conta 🧠")
 
     with st.form("register_form"):
         usuario = st.text_input("Nome de Usuário")
@@ -143,7 +120,6 @@ def tela_registro():
             if senha != confirmar_senha:
                 st.error("Senhas não coincidem")
                 return
-
             if get_user_by_email(email.lower()):
                 st.error("Email já cadastrado")
                 return
@@ -157,17 +133,17 @@ def tela_registro():
                 st.session_state.current_screen = "login"
                 st.rerun()
 
-    if st.button("Já tem conta ? Faça login"):
+    if st.button("Já tem conta? Faça login"):
         st.session_state.current_screen = "login"
         st.rerun()
 
 
 def mostrar_menu_navegacao():
-    col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+    col1, col2 = st.columns([3, 1])
     with col1:
         st.write(f"Olá, **{st.session_state.current_user.get('username', 'Usuário')}**! 👋")
-    with col4:
-        if st.button("🚪 Sair", key="menu_logout"):
+    with col2:
+        if st.button("🚪 Sair"):
             st.session_state.current_user = None
             st.session_state.current_screen = "login"
             st.rerun()
@@ -178,19 +154,17 @@ def tela_tarefas():
     st.markdown("---")
     st.title("📋 Minhas Tarefas")
 
-    tasks = get_tasks(st.session_state.current_user["user_id"])
+    tasks = get_tasks(st.session_state.current_user["id"])
     if not tasks:
         st.info("Nenhuma tarefa encontrada. Adicione sua primeira!")
         return
 
-    tasks = sorted(tasks, key=lambda t: t.get("due_date", "99:99"))
-
-    for tarefa in tasks:
+    for tarefa in sorted(tasks, key=lambda t: t.get("due_date", "99:99")):
         col1, col2, col3, col4 = st.columns([0.5, 3, 1, 0.5])
         with col1:
-            concluida = st.checkbox("✔", value=tarefa.get("completed", False), key=f"c_{tarefa['task_id']}")
+            concluida = st.checkbox("✔", value=tarefa.get("completed", False), key=f"c_{tarefa['id']}")
             if concluida != tarefa.get("completed", False):
-                update_task(tarefa["task_id"], {"completed": concluida})
+                update_task(tarefa["id"], {"completed": concluida})
                 st.rerun()
         with col2:
             texto = f"**{tarefa['title']}**"
@@ -200,13 +174,13 @@ def tela_tarefas():
                 texto += f"\n⏰ {tarefa['due_date']}"
             st.markdown(texto)
         with col3:
-            if st.button("✏️", key=f"edit_{tarefa['task_id']}"):
+            if st.button("✏️", key=f"edit_{tarefa['id']}"):
                 st.session_state.task_to_edit = tarefa
                 st.session_state.show_task_form = True
                 st.rerun()
         with col4:
-            if st.button("🗑️", key=f"delete_{tarefa['task_id']}"):
-                delete_task(tarefa["task_id"])
+            if st.button("🗑️", key=f"delete_{tarefa['id']}"):
+                delete_task(tarefa["id"])
                 st.success("Tarefa excluída!")
                 st.rerun()
 
@@ -230,10 +204,10 @@ def mostrar_dialogo_tarefa():
                 "type": "daily" if diaria else "single",
                 "completed": tarefa.get("completed", False)
             }
-            if tarefa.get("task_id"):
-                update_task(tarefa["task_id"], dados)
+            if tarefa.get("id"):
+                update_task(tarefa["id"], dados)
             else:
-                add_task(st.session_state.current_user["user_id"], **dados)
+                add_task(st.session_state.current_user["id"], **dados)
             st.session_state.task_to_edit = None
             st.session_state.show_task_form = False
             st.success("Tarefa salva com sucesso!")
@@ -244,11 +218,9 @@ def mostrar_dialogo_tarefa():
             st.session_state.show_task_form = False
             st.rerun()
 
-
 # =============================
 # Main
 # =============================
-
 def main():
     if st.session_state.current_user:
         notificacoes = verificar_notificacoes()
@@ -268,7 +240,6 @@ def main():
         else:
             st.session_state.current_screen = "login"
             st.rerun()
-
 
 if __name__ == "__main__":
     main()
