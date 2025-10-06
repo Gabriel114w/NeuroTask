@@ -54,9 +54,14 @@ def verificar_notificacoes():
 
 def mostrar_notificacao_popup(notificacao):
     st.markdown(f"""
-    <div style="position: fixed; top: 20px; right: 20px; 
-    background: {st.session_state.theme_settings['warning_color']};
-    color: #333; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1)">
+    <div style="
+        position: fixed; top: 20px; right: 10px; width: 90%;
+        max-width: 300px;
+        background: {st.session_state.theme_settings['warning_color']};
+        color: #333; padding: 15px; border-radius: 12px; z-index: 9999;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-size: 14px;
+    ">
         <strong>🔔 {notificacao['title']}</strong><br>
         {notificacao['description']}
     </div>
@@ -73,8 +78,8 @@ def validar_horario(hora):
 # Telas
 # =============================
 def tela_login():
-    st.title("NeuroTask 🧠")
-    st.subheader("Entre na sua conta")
+    st.markdown('<h2 style="text-align:center">NeuroTask 🧠</h2>', unsafe_allow_html=True)
+    st.markdown('<h4 style="text-align:center; color:#666;">Entre na sua conta</h4>', unsafe_allow_html=True)
     with st.form("login_form"):
         identificador = st.text_input("Email ou Nome de Usuário")
         senha = st.text_input("Senha", type="password")
@@ -97,7 +102,7 @@ def tela_login():
         st.rerun()
 
 def tela_registro():
-    st.title("Criar Conta 🧠")
+    st.markdown('<h2 style="text-align:center">Criar Conta 🧠</h2>', unsafe_allow_html=True)
     with st.form("register_form"):
         usuario = st.text_input("Nome de Usuário")
         email = st.text_input("Email")
@@ -126,13 +131,37 @@ def tela_registro():
         st.rerun()
 
 # =============================
-# Menu Lateral
+# Menu superior (mobile-friendly)
 # =============================
-def menu_lateral():
-    st.sidebar.title(f"Olá, {st.session_state.current_user['username']}! 👋")
-    escolha = st.sidebar.radio("Menu", ["📋 Tarefas", "⚙️ Configurações", "👤 Perfil"])
-    st.sidebar.markdown("---")
-    if st.sidebar.button("🚪 Sair"):
+def menu_superior():
+    st.markdown("""
+    <style>
+    .menu-container {
+        display: flex;
+        justify-content: space-around;
+        background-color: #FFD6BA;
+        padding: 10px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .menu-button {
+        background-color: #A1C3D1;
+        color: #333;
+        padding: 8px 15px;
+        border-radius: 10px;
+        margin: 3px;
+        text-align: center;
+        display: inline-block;
+        width: 100px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    cols = st.columns([1,1,1])
+    escolha = st.radio("", ["📋 Tarefas", "⚙️ Configurações", "👤 Perfil"], horizontal=True)
+    if st.button("🚪 Sair"):
         st.session_state.current_user = None
         st.session_state.current_screen = "login"
         st.rerun()
@@ -145,37 +174,26 @@ def tela_tarefas():
     if st.session_state.show_task_form:
         mostrar_dialogo_tarefa()
     else:
-        st.title("📋 Minhas Tarefas")
+        st.markdown('<h3 style="text-align:center">📋 Minhas Tarefas</h3>', unsafe_allow_html=True)
         tasks = get_tasks(st.session_state.current_user["id"])
         if not tasks:
             st.info("Nenhuma tarefa encontrada. Adicione sua primeira!")
             return
         for tarefa in sorted(tasks, key=lambda t: t.get("due_date", "99:99")):
-            # Card da tarefa
             st.markdown(f"""
             <div style="
                 background-color: {st.session_state.theme_settings['primary_color']};
-                padding: 15px;
-                border-radius: 15px;
-                margin-bottom: 10px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                padding: 15px; border-radius: 20px;
+                margin-bottom: 15px;
+                box-shadow: 0 6px 10px rgba(0,0,0,0.12);
                 color: {st.session_state.theme_settings['text_color']};
+                font-size: 16px;
             ">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>{tarefa['title']}</strong><br>
-                        {tarefa.get('description','')}<br>
-                        ⏰ {tarefa.get('due_date','')}
-                    </div>
-                    <div>
-                        <form>
-                            <input type="checkbox" {'checked' if tarefa.get('completed') else ''}/> ✔
-                        </form>
-                    </div>
-                </div>
+                <strong>{tarefa['title']}</strong><br>
+                {tarefa.get('description','')}<br>
+                ⏰ {tarefa.get('due_date','')}
             </div>
             """, unsafe_allow_html=True)
-
         if st.button("➕ Adicionar Tarefa"):
             st.session_state.show_task_form = True
             st.rerun()
@@ -220,11 +238,11 @@ def mostrar_dialogo_tarefa():
 # Configurações e Perfil
 # =============================
 def tela_configuracoes():
-    st.title("⚙️ Configurações")
+    st.markdown('<h3>⚙️ Configurações</h3>', unsafe_allow_html=True)
     st.info("Aqui você poderá futuramente alterar tema, notificações e preferências.")
 
 def tela_perfil():
-    st.title("👤 Perfil")
+    st.markdown('<h3>👤 Perfil</h3>', unsafe_allow_html=True)
     st.write(f"**Nome de Usuário:** {st.session_state.current_user['username']}")
     st.write(f"**Email:** {st.session_state.current_user['email']}")
 
@@ -243,7 +261,7 @@ def main():
     elif st.session_state.current_screen == "register":
         tela_registro()
     elif st.session_state.current_screen == "menu":
-        escolha = menu_lateral()
+        escolha = menu_superior()
         if escolha == "📋 Tarefas":
             tela_tarefas()
         elif escolha == "⚙️ Configurações":
