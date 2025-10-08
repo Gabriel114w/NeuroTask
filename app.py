@@ -27,70 +27,76 @@ def init_session_state():
         st.session_state.layout_mode = "desktop"
     if 'sidebar_expanded' not in st.session_state:
         st.session_state.sidebar_expanded = True
+    if 'confirm_delete' not in st.session_state:
+        st.session_state.confirm_delete = False
 
 # =============================
-# Theme Configuration - Cores Pastéis para TDAH
+# Theme Configuration - Cores Suaves e Pastéis
 # =============================
 THEMES = {
     "light_calm": {
         "name": "Calmo Claro",
-        "primary": "#E8F4F8",
-        "secondary": "#D4E9F0", 
-        "accent": "#7AB8D9",
-        "background": "#F8FAFB",
+        "primary": "#E3F2FD",
+        "secondary": "#BBDEFB", 
+        "accent": "#64B5F6",
+        "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#2C3E50",
-        "text_secondary": "#5D6D7E",
-        "success": "#9BC59D",
-        "warning": "#F4C96B",
-        "error": "#E89B9B",
-        "border": "#D4E4E9",
-        "shadow": "rgba(0, 0, 0, 0.05)"
+        "text": "#37474F",
+        "text_secondary": "#78909C",
+        "success": "#A5D6A7",
+        "warning": "#FFE082",
+        "error": "#EF9A9A",
+        "border": "#E0E0E0",
+        "shadow": "rgba(0, 0, 0, 0.08)",
+        "hover": "#F5F5F5"
     },
     "light_warm": {
         "name": "Suave Claro",
-        "primary": "#FAF3E8",
-        "secondary": "#F5E9D4",
-        "accent": "#D9A87A",
-        "background": "#FDFBF7",
+        "primary": "#FFF3E0",
+        "secondary": "#FFE0B2",
+        "accent": "#FFB74D",
+        "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#3E3028",
-        "text_secondary": "#6D5D4E",
-        "success": "#A8C89C",
-        "warning": "#E8BA7A",
-        "error": "#D99B9B",
-        "border": "#E9E0D4",
-        "shadow": "rgba(0, 0, 0, 0.05)"
+        "text": "#4E342E",
+        "text_secondary": "#8D6E63",
+        "success": "#C5E1A5",
+        "warning": "#FFCC80",
+        "error": "#FFAB91",
+        "border": "#E0E0E0",
+        "shadow": "rgba(0, 0, 0, 0.08)",
+        "hover": "#FFF8F0"
     },
     "dark_calm": {
         "name": "Calmo Escuro",
-        "primary": "#2A3942",
-        "secondary": "#354854",
-        "accent": "#7AB8D9",
-        "background": "#1E2A32",
-        "surface": "#2A3942",
-        "text": "#E8F4F8",
-        "text_secondary": "#B8C9D4",
-        "success": "#9BC59D",
-        "warning": "#D9B87A",
-        "error": "#C98B8B",
-        "border": "#3E4E5A",
-        "shadow": "rgba(0, 0, 0, 0.3)"
+        "primary": "#263238",
+        "secondary": "#37474F",
+        "accent": "#64B5F6",
+        "background": "#1A1A1A",
+        "surface": "#263238",
+        "text": "#ECEFF1",
+        "text_secondary": "#B0BEC5",
+        "success": "#81C784",
+        "warning": "#FFD54F",
+        "error": "#E57373",
+        "border": "#37474F",
+        "shadow": "rgba(0, 0, 0, 0.3)",
+        "hover": "#2C393F"
     },
     "dark_warm": {
         "name": "Suave Escuro",
-        "primary": "#3A342E",
-        "secondary": "#4A4038",
-        "accent": "#C9A87A",
-        "background": "#2E2822",
-        "surface": "#3A342E",
-        "text": "#F8F3E8",
-        "text_secondary": "#C9BBB0",
-        "success": "#A8C89C",
-        "warning": "#D9B87A",
-        "error": "#C98B8B",
-        "border": "#4E453A",
-        "shadow": "rgba(0, 0, 0, 0.3)"
+        "primary": "#3E2723",
+        "secondary": "#4E342E",
+        "accent": "#FFAB40",
+        "background": "#1A1A1A",
+        "surface": "#3E2723",
+        "text": "#EFEBE9",
+        "text_secondary": "#BCAAA4",
+        "success": "#AED581",
+        "warning": "#FFB74D",
+        "error": "#FF8A65",
+        "border": "#4E342E",
+        "shadow": "rgba(0, 0, 0, 0.3)",
+        "hover": "#4A2C24"
     }
 }
 
@@ -99,56 +105,115 @@ def apply_theme_css():
     
     css = f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
     * {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        box-sizing: border-box;
     }}
     
     .main {{
         background-color: {theme['background']};
+        padding: 0;
     }}
     
+    .block-container {{
+        padding: 2rem 1rem;
+        max-width: 1400px;
+    }}
+    
+    /* Task Cards - Blocos Visuais Dinâmicos */
     .task-card {{
         background: {theme['surface']};
         border: 1px solid {theme['border']};
-        border-radius: 8px;
-        padding: 20px;
-        margin: 12px 0;
-        box-shadow: 0 1px 3px {theme['shadow']};
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px {theme['shadow']};
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
+        overflow: hidden;
+    }}
+    
+    .task-card::before {{
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: {theme['accent']};
+        transition: width 0.3s ease;
     }}
     
     .task-card:hover {{
-        box-shadow: 0 4px 12px {theme['shadow']};
+        box-shadow: 0 6px 20px {theme['shadow']};
         transform: translateY(-2px);
         border-color: {theme['accent']};
     }}
     
+    .task-card:hover::before {{
+        width: 6px;
+    }}
+    
     .task-completed {{
-        opacity: 0.5;
+        opacity: 0.65;
         background: {theme['primary']};
     }}
     
-    .task-priority-high {{
-        border-left: 3px solid {theme['error']};
+    .task-completed::before {{
+        background: {theme['success']} !important;
     }}
     
-    .task-priority-medium {{
-        border-left: 3px solid {theme['warning']};
+    .task-priority-high::before {{
+        background: {theme['error']} !important;
     }}
     
-    .task-priority-low {{
-        border-left: 3px solid {theme['success']};
+    .task-priority-medium::before {{
+        background: {theme['warning']} !important;
     }}
     
+    .task-priority-low::before {{
+        background: {theme['success']} !important;
+    }}
+    
+    .task-title {{
+        font-size: 18px;
+        font-weight: 600;
+        color: {theme['text']};
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+    }}
+    
+    .task-description {{
+        font-size: 14px;
+        color: {theme['text_secondary']};
+        margin: 8px 0;
+        line-height: 1.6;
+    }}
+    
+    .task-meta {{
+        font-size: 13px;
+        color: {theme['text_secondary']};
+        margin-top: 12px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }}
+    
+    .task-meta-item {{
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }}
+    
+    /* Priority Badges */
     .priority-badge {{
         display: inline-block;
         padding: 4px 12px;
-        border-radius: 12px;
+        border-radius: 16px;
         font-size: 11px;
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }}
@@ -168,56 +233,51 @@ def apply_theme_css():
         color: white;
     }}
     
+    /* Stats Cards */
     .stats-card {{
         background: {theme['surface']};
         border: 1px solid {theme['border']};
-        padding: 20px;
-        border-radius: 8px;
+        padding: 24px;
+        border-radius: 12px;
         text-align: center;
-        box-shadow: 0 1px 3px {theme['shadow']};
+        box-shadow: 0 2px 8px {theme['shadow']};
+        transition: all 0.3s ease;
+    }}
+    
+    .stats-card:hover {{
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px {theme['shadow']};
     }}
     
     .stats-number {{
-        font-size: 32px;
-        font-weight: 600;
+        font-size: 36px;
+        font-weight: 700;
         color: {theme['accent']};
-        line-height: 1.2;
+        line-height: 1;
+        margin-bottom: 8px;
     }}
     
     .stats-label {{
-        font-size: 13px;
+        font-size: 12px;
         color: {theme['text_secondary']};
-        margin-top: 8px;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }}
     
-    .notification-popup {{
-        position: fixed;
-        top: 24px;
-        right: 24px;
-        background: {theme['surface']};
-        color: {theme['text']};
-        padding: 16px 20px;
-        border-radius: 8px;
-        border-left: 4px solid {theme['accent']};
-        box-shadow: 0 4px 16px {theme['shadow']};
-        z-index: 9999;
-        animation: slideIn 0.3s ease-out;
-    }}
-    
-    @keyframes slideIn {{
-        from {{ transform: translateX(100%); opacity: 0; }}
-        to {{ transform: translateX(0); opacity: 1; }}
-    }}
-    
+    /* Page Headers */
     .page-header {{
-        font-size: 28px;
-        font-weight: 600;
+        font-size: 32px;
+        font-weight: 700;
         color: {theme['text']};
-        margin-bottom: 24px;
+        margin-bottom: 8px;
         letter-spacing: -0.5px;
+    }}
+    
+    .page-subtitle {{
+        font-size: 16px;
+        color: {theme['text_secondary']};
+        margin-bottom: 32px;
     }}
     
     .section-title {{
@@ -226,61 +286,127 @@ def apply_theme_css():
         color: {theme['text_secondary']};
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin: 24px 0 12px 0;
+        margin: 32px 0 16px 0;
     }}
     
+    /* Profile Card */
     .profile-card {{
         background: {theme['surface']};
-        border-radius: 8px;
-        padding: 24px;
-        box-shadow: 0 1px 3px {theme['shadow']};
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px {theme['shadow']};
         border: 1px solid {theme['border']};
     }}
     
-    .theme-preview {{
-        width: 100%;
-        height: 60px;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        border: 2px solid {theme['border']};
-    }}
-    
-    .theme-preview:hover {{
-        border-color: {theme['accent']};
-        transform: scale(1.02);
-    }}
-    
-    .desktop-layout {{
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 24px;
-    }}
-    
-    .mobile-layout {{
-        padding: 16px;
-    }}
-    
-    div[data-testid="stSidebarContent"] {{
-        background-color: {theme['surface']};
-        border-right: 1px solid {theme['border']};
-    }}
-    
+    /* Buttons */
     .stButton button {{
         background-color: {theme['accent']};
         color: white;
         border: none;
-        border-radius: 6px;
-        padding: 10px 20px;
+        border-radius: 8px;
+        padding: 12px 24px;
         font-weight: 500;
-        transition: all 0.2s;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        width: 100%;
     }}
     
     .stButton button:hover {{
         background-color: {theme['accent']};
         opacity: 0.9;
         transform: translateY(-1px);
+        box-shadow: 0 4px 12px {theme['shadow']};
+    }}
+    
+    /* Sidebar */
+    div[data-testid="stSidebarContent"] {{
+        background-color: {theme['surface']};
+        border-right: 1px solid {theme['border']};
+    }}
+    
+    /* Forms */
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {{
+        border-radius: 8px;
+        border: 1px solid {theme['border']};
+        background-color: {theme['surface']};
+        color: {theme['text']};
+        padding: 12px;
+        font-size: 14px;
+    }}
+    
+    .stTextInput input:focus, .stTextArea textarea:focus {{
+        border-color: {theme['accent']};
+        box-shadow: 0 0 0 2px {theme['primary']};
+    }}
+    
+    /* Checkbox */
+    .stCheckbox {{
+        margin-top: 8px;
+    }}
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding: 1rem 0.5rem;
+        }}
+        
+        .task-card {{
+            padding: 16px;
+            margin: 12px 0;
+        }}
+        
+        .task-title {{
+            font-size: 16px;
+        }}
+        
+        .stats-number {{
+            font-size: 28px;
+        }}
+        
+        .page-header {{
+            font-size: 24px;
+        }}
+    }}
+    
+    /* Notification */
+    .notification-popup {{
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        background: {theme['surface']};
+        color: {theme['text']};
+        padding: 16px 20px;
+        border-radius: 12px;
+        border-left: 4px solid {theme['accent']};
+        box-shadow: 0 6px 24px {theme['shadow']};
+        z-index: 9999;
+        animation: slideIn 0.3s ease-out;
+        max-width: 400px;
+    }}
+    
+    @keyframes slideIn {{
+        from {{ transform: translateX(100%); opacity: 0; }}
+        to {{ transform: translateX(0); opacity: 1; }}
+    }}
+    
+    /* Empty State */
+    .empty-state {{
+        text-align: center;
+        padding: 64px 32px;
+        color: {theme['text_secondary']};
+    }}
+    
+    .empty-state-icon {{
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }}
+    
+    /* Divider */
+    hr {{
+        border: none;
+        border-top: 1px solid {theme['border']};
+        margin: 24px 0;
     }}
     </style>
     """
@@ -339,7 +465,7 @@ def tela_login():
     
     with col2:
         st.markdown('<div class="page-header" style="text-align: center; margin-top: 80px;">NeuroTask</div>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align: center; color: #5D6D7E; margin-bottom: 40px;">Organize suas tarefas com foco e clareza</p>', unsafe_allow_html=True)
+        st.markdown('<p class="page-subtitle" style="text-align: center;">Organize suas tarefas com foco e clareza</p>', unsafe_allow_html=True)
         
         with st.form("login_form"):
             identificador = st.text_input("Email ou Nome de Usuário", placeholder="Digite seu email ou usuário")
@@ -362,7 +488,7 @@ def tela_login():
                     st.session_state.current_user = user
                     st.session_state.current_screen = "dashboard"
                     st.success("Login realizado com sucesso!")
-                    time.sleep(1)
+                    time.sleep(0.5)
                     st.rerun()
                 else:
                     st.error("Credenciais inválidas")
@@ -377,7 +503,7 @@ def tela_registro():
     
     with col2:
         st.markdown('<div class="page-header" style="text-align: center; margin-top: 80px;">NeuroTask</div>', unsafe_allow_html=True)
-        st.markdown('<p style="text-align: center; color: #5D6D7E; margin-bottom: 40px;">Criar Nova Conta</p>', unsafe_allow_html=True)
+        st.markdown('<p class="page-subtitle" style="text-align: center;">Criar Nova Conta</p>', unsafe_allow_html=True)
         
         with st.form("register_form"):
             usuario = st.text_input("Nome de Usuário", placeholder="Escolha um nome de usuário")
@@ -405,7 +531,7 @@ def tela_registro():
                     novo = create_user(usuario, email.lower(), senha)
                     if novo:
                         st.success("Registro bem-sucedido! Faça login.")
-                        time.sleep(1)
+                        time.sleep(0.5)
                         st.session_state.current_screen = "login"
                         st.rerun()
                 except Exception as e:
@@ -423,7 +549,7 @@ def mostrar_menu_lateral():
     with st.sidebar:
         # Header do usuário
         user = st.session_state.current_user
-        st.markdown(f'<div class="page-header" style="font-size: 18px; margin-bottom: 8px;">Olá, {user.get("username", "Usuário")}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="page-header" style="font-size: 20px; margin-bottom: 8px;">Olá, {user.get("username", "Usuário")}</div>', unsafe_allow_html=True)
         
         # Estatísticas rápidas
         stats = get_user_stats(user["id"])
@@ -440,17 +566,30 @@ def mostrar_menu_lateral():
         if st.button("Nova Tarefa", use_container_width=True, key="btn_nova_tarefa"):
             st.session_state.show_task_form = True
             st.session_state.task_to_edit = None
+            st.session_state.current_screen = "dashboard"
+            st.rerun()
+        
+        if st.button("Dashboard", use_container_width=True, key="btn_dashboard"):
+            st.session_state.show_task_form = False
+            st.session_state.show_profile = False
+            st.session_state.current_screen = "dashboard"
             st.rerun()
         
         if st.button("Tarefas Pendentes", use_container_width=True, key="btn_pendentes"):
+            st.session_state.show_task_form = False
+            st.session_state.show_profile = False
             st.session_state.current_screen = "pending_tasks"
             st.rerun()
         
         if st.button("Perfil", use_container_width=True, key="btn_perfil"):
             st.session_state.show_profile = True
+            st.session_state.show_task_form = False
+            st.session_state.current_screen = "dashboard"
             st.rerun()
         
         if st.button("Configurações", use_container_width=True, key="btn_config"):
+            st.session_state.show_task_form = False
+            st.session_state.show_profile = False
             st.session_state.current_screen = "settings"
             st.rerun()
         
@@ -474,7 +613,7 @@ def mostrar_menu_lateral():
 # Profile Screen
 # =============================
 def mostrar_perfil():
-    st.markdown("# Perfil do Usuário")
+    st.markdown('<div class="page-header">Perfil do Usuário</div>', unsafe_allow_html=True)
     
     user = st.session_state.current_user
     stats = get_user_stats(user["id"])
@@ -492,11 +631,10 @@ def mostrar_perfil():
         st.markdown('<div class="profile-card">', unsafe_allow_html=True)
         st.markdown("### Estatísticas")
         st.markdown(f"**Total de Tarefas:** {stats['total']}")
-        st.markdown(f"**Concluídas:** {stats['completed']}")
-        st.markdown(f"**Pendentes:** {stats['pending']}")
+        st.markdown(f"**Tarefas Concluídas:** {stats['completed']}")
+        st.markdown(f"**Tarefas Pendentes:** {stats['pending']}")
         st.markdown(f"**Taxa de Conclusão:** {stats['completion_rate']:.1f}%")
         
-        # Progresso visual
         if stats['total'] > 0:
             st.progress(stats['completion_rate'] / 100)
         
@@ -538,7 +676,7 @@ def mostrar_perfil():
 # Settings Screen
 # =============================
 def tela_configuracoes():
-    st.markdown("# Configurações")
+    st.markdown('<div class="page-header">Configurações</div>', unsafe_allow_html=True)
     
     st.markdown("### Escolher Tema")
     
@@ -583,7 +721,7 @@ def tela_configuracoes():
 # Task Management
 # =============================
 def render_task_card(tarefa, container_type="normal"):
-    """Renderiza um card de tarefa com visual otimizado para TDAH"""
+    """Renderiza um card de tarefa com visual otimizado"""
     
     priority_class = ""
     if tarefa.get("priority") == "high":
@@ -600,12 +738,12 @@ def render_task_card(tarefa, container_type="normal"):
     with st.container():
         st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
         
-        col1, col2, col3, col4 = st.columns([0.5, 3, 1, 0.5])
+        col1, col2, col3 = st.columns([0.5, 5, 1.5])
         
         with col1:
             # Checkbox para marcar como concluída
             concluida = st.checkbox(
-                "✔", 
+                "✓", 
                 value=tarefa.get("completed", False), 
                 key=f"task_check_{tarefa['id']}_{container_type}",
                 label_visibility="collapsed"
@@ -618,109 +756,114 @@ def render_task_card(tarefa, container_type="normal"):
         with col2:
             # Título e descrição
             title_style = "text-decoration: line-through; opacity: 0.6;" if tarefa.get("completed", False) else ""
-            st.markdown(f'<h4 style="{title_style}">{tarefa["title"]}</h4>', unsafe_allow_html=True)
+            st.markdown(f'<div class="task-title" style="{title_style}">{tarefa["title"]}</div>', unsafe_allow_html=True)
             
             if tarefa.get('description'):
-                st.markdown(f'<p style="{title_style}">{tarefa["description"]}</p>', unsafe_allow_html=True)
+                st.markdown(f'<div class="task-description" style="{title_style}">{tarefa["description"]}</div>', unsafe_allow_html=True)
             
             # Informações adicionais
-            info_items = []
+            meta_items = []
             if tarefa.get('due_date'):
-                info_items.append(f"{tarefa['due_date']}")
+                meta_items.append(f'<span class="task-meta-item">Horário: {tarefa["due_date"]}</span>')
             if tarefa.get('priority'):
                 priority_text = {"high": "Alta", "medium": "Média", "low": "Baixa"}.get(tarefa['priority'], "")
-                info_items.append(f"{priority_text}")
+                priority_class_badge = f"priority-{tarefa['priority']}"
+                meta_items.append(f'<span class="priority-badge {priority_class_badge}">{priority_text}</span>')
             if tarefa.get('type') == 'daily':
-                info_items.append("Diária")
+                meta_items.append('<span class="task-meta-item">Diária</span>')
             
-            if info_items:
-                st.markdown(f'<small style="{title_style}">{" | ".join(info_items)}</small>', unsafe_allow_html=True)
+            if meta_items:
+                st.markdown(f'<div class="task-meta">{" ".join(meta_items)}</div>', unsafe_allow_html=True)
         
         with col3:
-            # Botão de editar
-            if st.button("Editar", key=f"edit_{tarefa['id']}_{container_type}", help="Editar tarefa"):
-                st.session_state.task_to_edit = tarefa
-                st.session_state.show_task_form = True
-                st.rerun()
-        
-        with col4:
-            # Botão de excluir
-            if st.button("Excluir", key=f"delete_{tarefa['id']}_{container_type}", help="Excluir tarefa"):
-                delete_task(tarefa["id"])
-                st.success("Tarefa excluída!")
-                time.sleep(1)
-                st.rerun()
+            # Botões de ação
+            col_edit, col_delete = st.columns(2)
+            with col_edit:
+                if st.button("Editar", key=f"edit_{tarefa['id']}_{container_type}", help="Editar tarefa", use_container_width=True):
+                    st.session_state.task_to_edit = tarefa
+                    st.session_state.show_task_form = True
+                    st.rerun()
+            
+            with col_delete:
+                if st.button("Excluir", key=f"delete_{tarefa['id']}_{container_type}", help="Excluir tarefa", use_container_width=True):
+                    delete_task(tarefa["id"])
+                    st.success("Tarefa excluída!")
+                    time.sleep(0.5)
+                    st.rerun()
         
         st.markdown('</div>', unsafe_allow_html=True)
 
 def formulario_tarefa():
-    """Formulário para adicionar/editar tarefa"""
+    """Formulário para adicionar/editar tarefa - CORRIGIDO"""
     tarefa = st.session_state.task_to_edit or {}
     titulo_form = "Editar Tarefa" if tarefa else "Nova Tarefa"
     
-    st.markdown(f"## {titulo_form}")
+    st.markdown(f'<div class="page-header">{titulo_form}</div>', unsafe_allow_html=True)
     
-    with st.form("task_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            titulo = st.text_input("Título", value=tarefa.get("title", ""))
-            horario = st.text_input("Horário (HH:MM)", value=tarefa.get("due_date", ""))
-        
-        with col2:
-            prioridade = st.selectbox(
-                "Prioridade",
-                options=["low", "medium", "high"],
-                index=["low", "medium", "high"].index(tarefa.get("priority", "low")),
-                format_func=lambda x: {"low": "Baixa", "medium": "Média", "high": "Alta"}[x]
-            )
-            diaria = st.checkbox("Tarefa Diária", value=tarefa.get("type") == "daily")
-        
-        descricao = st.text_area("Descrição", value=tarefa.get("description", ""))
-        
-        col_save, col_cancel = st.columns(2)
-        
-        with col_save:
-            salvar = st.form_submit_button("Salvar", use_container_width=True)
-        
-        with col_cancel:
-            cancelar = st.form_submit_button("Cancelar", use_container_width=True)
-        
-        if salvar:
+    # Usar inputs diretos fora do form para melhor controle
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        titulo = st.text_input("Título da Tarefa", value=tarefa.get("title", ""), key="input_titulo")
+        horario = st.text_input("Horário (HH:MM)", value=tarefa.get("due_date", ""), key="input_horario", placeholder="Ex: 14:30")
+    
+    with col2:
+        prioridade = st.selectbox(
+            "Prioridade",
+            options=["low", "medium", "high"],
+            index=["low", "medium", "high"].index(tarefa.get("priority", "low")),
+            format_func=lambda x: {"low": "Baixa", "medium": "Média", "high": "Alta"}[x],
+            key="input_prioridade"
+        )
+        diaria = st.checkbox("Tarefa Diária", value=tarefa.get("type") == "daily", key="input_diaria")
+    
+    descricao = st.text_area("Descrição", value=tarefa.get("description", ""), key="input_descricao", height=100)
+    
+    st.markdown("---")
+    
+    col_save, col_cancel = st.columns(2)
+    
+    with col_save:
+        if st.button("Salvar Tarefa", use_container_width=True, type="primary"):
             if not titulo.strip():
                 st.error("O título é obrigatório!")
-                return
-            
-            if tarefa.get("id"):
-                # Atualização - inclui completed
-                dados = {
-                    "title": titulo.strip(),
-                    "description": descricao.strip(),
-                    "due_date": horario.strip(),
-                    "priority": prioridade,
-                    "type": "daily" if diaria else "single",
-                    "completed": tarefa.get("completed", False)
-                }
-                update_task(tarefa["id"], dados)
-                st.success("Tarefa atualizada!")
             else:
-                # Criação - sem completed
-                add_task(
-                    st.session_state.current_user["id"],
-                    title=titulo.strip(),
-                    description=descricao.strip(),
-                    due_date=horario.strip(),
-                    type="daily" if diaria else "single",
-                    priority=prioridade
-                )
-                st.success("Tarefa criada!")
-            
-            st.session_state.task_to_edit = None
-            st.session_state.show_task_form = False
-            time.sleep(1)
-            st.rerun()
-        
-        if cancelar:
+                try:
+                    if tarefa.get("id"):
+                        # Atualização
+                        dados = {
+                            "title": titulo.strip(),
+                            "description": descricao.strip(),
+                            "due_date": horario.strip(),
+                            "priority": prioridade,
+                            "type": "daily" if diaria else "single",
+                            "completed": tarefa.get("completed", False)
+                        }
+                        update_task(tarefa["id"], dados)
+                        st.success("Tarefa atualizada com sucesso!")
+                    else:
+                        # Criação
+                        add_task(
+                            st.session_state.current_user["id"],
+                            title=titulo.strip(),
+                            description=descricao.strip(),
+                            due_date=horario.strip(),
+                            type="daily" if diaria else "single",
+                            priority=prioridade
+                        )
+                        st.success("Tarefa criada com sucesso!")
+                    
+                    # Limpar estado e recarregar
+                    time.sleep(0.5)
+                    st.session_state.task_to_edit = None
+                    st.session_state.show_task_form = False
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Erro ao salvar tarefa: {str(e)}")
+    
+    with col_cancel:
+        if st.button("Cancelar", use_container_width=True):
             st.session_state.task_to_edit = None
             st.session_state.show_task_form = False
             st.rerun()
@@ -728,29 +871,30 @@ def formulario_tarefa():
 def tela_dashboard():
     """Dashboard principal com visualização de tarefas em blocos"""
     
-    layout_class = f"{st.session_state.layout_mode}-layout"
-    st.markdown(f'<div class="main-container {layout_class}">', unsafe_allow_html=True)
-    
     # Header
-    st.markdown("# NeuroTask Dashboard")
+    st.markdown('<div class="page-header">Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Visão geral das suas tarefas</div>', unsafe_allow_html=True)
     
     # Estatísticas rápidas
     stats = get_user_stats(st.session_state.current_user["id"])
     
     if st.session_state.layout_mode == "mobile":
-        # Layout mobile - cards em coluna
-        st.markdown(f'<div class="stats-card">Total: {stats["total"]} | Pendentes: {stats["pending"]} | Concluídas: {stats["completed"]}</div>', unsafe_allow_html=True)
+        # Layout mobile - cards empilhados
+        st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["total"]}</div><div class="stats-label">Total de Tarefas</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["pending"]}</div><div class="stats-label">Pendentes</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["completed"]}</div><div class="stats-label">Concluídas</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["completion_rate"]:.1f}%</div><div class="stats-label">Taxa de Conclusão</div></div>', unsafe_allow_html=True)
     else:
         # Layout desktop - cards em linha
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.markdown(f'<div class="stats-card"><strong>{stats["total"]}</strong><br>Total de Tarefas</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["total"]}</div><div class="stats-label">Total</div></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown(f'<div class="stats-card"><strong>{stats["pending"]}</strong><br>Pendentes</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["pending"]}</div><div class="stats-label">Pendentes</div></div>', unsafe_allow_html=True)
         with col3:
-            st.markdown(f'<div class="stats-card"><strong>{stats["completed"]}</strong><br>Concluídas</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["completed"]}</div><div class="stats-label">Concluídas</div></div>', unsafe_allow_html=True)
         with col4:
-            st.markdown(f'<div class="stats-card"><strong>{stats["completion_rate"]:.1f}%</strong><br>Taxa de Conclusão</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stats-card"><div class="stats-number">{stats["completion_rate"]:.1f}%</div><div class="stats-label">Conclusão</div></div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -758,8 +902,13 @@ def tela_dashboard():
     tasks = get_tasks(st.session_state.current_user["id"])
     
     if not tasks:
-        st.info("Nenhuma tarefa encontrada. Use o menu lateral para adicionar sua primeira tarefa!")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>Nenhuma tarefa encontrada</h3>
+            <p>Comece criando sua primeira tarefa usando o botão "Nova Tarefa" no menu lateral.</p>
+        </div>
+        """, unsafe_allow_html=True)
         return
     
     # Filtros e ordenação
@@ -769,21 +918,24 @@ def tela_dashboard():
         filtro_status = st.selectbox(
             "Status", 
             ["todas", "pendentes", "concluidas"],
-            format_func=lambda x: {"todas": "Todas", "pendentes": "Pendentes", "concluidas": "Concluídas"}[x]
+            format_func=lambda x: {"todas": "Todas", "pendentes": "Pendentes", "concluidas": "Concluídas"}[x],
+            key="filtro_status"
         )
     
     with col_filter2:
         filtro_prioridade = st.selectbox(
             "Prioridade",
             ["todas", "high", "medium", "low"],
-            format_func=lambda x: {"todas": "Todas", "high": "Alta", "medium": "Média", "low": "Baixa"}[x]
+            format_func=lambda x: {"todas": "Todas", "high": "Alta", "medium": "Média", "low": "Baixa"}[x],
+            key="filtro_prioridade"
         )
     
     with col_filter3:
         ordenacao = st.selectbox(
             "Ordenar por",
-            ["due_date", "priority", "title", "created_at"],
-            format_func=lambda x: {"due_date": "Horário", "priority": "Prioridade", "title": "Título", "created_at": "Criação"}[x]
+            ["priority", "due_date", "title", "created_at"],
+            format_func=lambda x: {"due_date": "Horário", "priority": "Prioridade", "title": "Título", "created_at": "Criação"}[x],
+            key="ordenacao"
         )
     
     # Aplicar filtros
@@ -798,48 +950,61 @@ def tela_dashboard():
         filtered_tasks = [t for t in filtered_tasks if t.get("priority") == filtro_prioridade]
     
     # Ordenar tarefas
-    reverse_order = ordenacao in ["priority", "due_date"]
     if ordenacao == "priority":
         priority_order = {"high": 3, "medium": 2, "low": 1}
         filtered_tasks.sort(key=lambda t: priority_order.get(t.get("priority", "low"), 1), reverse=True)
+    elif ordenacao == "due_date":
+        filtered_tasks.sort(key=lambda t: t.get("due_date", "99:99"))
+    elif ordenacao == "title":
+        filtered_tasks.sort(key=lambda t: t.get("title", "").lower())
     else:
-        filtered_tasks.sort(key=lambda t: t.get(ordenacao, ""), reverse=reverse_order)
+        filtered_tasks.sort(key=lambda t: t.get("created_at", ""), reverse=True)
     
     # Exibir tarefas em blocos visuais
-    st.markdown(f"### {len(filtered_tasks)} tarefa(s) encontrada(s)")
+    st.markdown(f'<div class="section-title">{len(filtered_tasks)} tarefa(s) encontrada(s)</div>', unsafe_allow_html=True)
     
-    for i, tarefa in enumerate(filtered_tasks):
-        render_task_card(tarefa, "dashboard")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    if not filtered_tasks:
+        st.info("Nenhuma tarefa corresponde aos filtros selecionados.")
+    else:
+        for i, tarefa in enumerate(filtered_tasks):
+            render_task_card(tarefa, f"dashboard_{i}")
 
 def tela_tarefas_pendentes():
     """Tela específica para tarefas pendentes"""
-    st.markdown("# Tarefas Pendentes")
+    st.markdown('<div class="page-header">Tarefas Pendentes</div>', unsafe_allow_html=True)
     
     tasks = get_tasks(st.session_state.current_user["id"])
     pending_tasks = [t for t in tasks if not t.get("completed", False)]
     
     if not pending_tasks:
-        st.success("Parabéns! Você não tem tarefas pendentes!")
-        if st.button("Voltar ao Dashboard"):
+        st.markdown("""
+        <div class="empty-state">
+            <div class="empty-state-icon">✓</div>
+            <h3>Parabéns!</h3>
+            <p>Você não tem tarefas pendentes no momento.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Voltar ao Dashboard", use_container_width=True):
             st.session_state.current_screen = "dashboard"
             st.rerun()
         return
     
-    st.markdown(f"Você tem **{len(pending_tasks)}** tarefa(s) pendente(s)")
+    st.markdown(f'<div class="page-subtitle">Você tem {len(pending_tasks)} tarefa(s) pendente(s)</div>', unsafe_allow_html=True)
     
     # Ordenar por prioridade e horário
     priority_order = {"high": 3, "medium": 2, "low": 1}
     pending_tasks.sort(key=lambda t: (
-        priority_order.get(t.get("priority", "low"), 1),
+        -priority_order.get(t.get("priority", "low"), 1),
         t.get("due_date", "99:99")
-    ), reverse=True)
+    ))
     
-    for tarefa in pending_tasks:
-        render_task_card(tarefa, "pending")
+    for i, tarefa in enumerate(pending_tasks):
+        render_task_card(tarefa, f"pending_{i}")
     
-    if st.button("Voltar ao Dashboard"):
+    st.markdown("---")
+    
+    if st.button("Voltar ao Dashboard", use_container_width=True):
         st.session_state.current_screen = "dashboard"
         st.rerun()
 
