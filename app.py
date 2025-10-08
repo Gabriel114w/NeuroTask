@@ -794,7 +794,7 @@ def render_task_card(tarefa, container_type="normal"):
         st.markdown('</div>', unsafe_allow_html=True)
 
 def formulario_tarefa():
-    """Formulário para adicionar/editar tarefa - CORRIGIDO"""
+    """Formulário para adicionar/editar tarefa"""
     tarefa = st.session_state.task_to_edit or {}
     titulo_form = "Editar Tarefa" if tarefa else "Nova Tarefa"
     
@@ -869,89 +869,12 @@ def formulario_tarefa():
             st.rerun()
 
 def tela_dashboard():
-    st.markdown("<h2 class='dashboard-title'>📋 Dashboard de Tarefas</h2>", unsafe_allow_html=True)
-
-    st.markdown("""
-        <div class='task-section'>
-            <p>Gerencie suas tarefas de forma prática e visualize seu progresso diário.</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.divider()
-
-    # =====================
-    # Carregar tarefas do usuário logado
-    # =====================
-    user = st.session_state.current_user
-    if not user:
-        st.warning("Você precisa estar logado para acessar o dashboard.")
-        return
-
-    tasks = get_tasks(user["email"])
-    if tasks is None:
-        tasks = []
-
-    # =====================
-    # Novo bloco de criação de tarefa
-    # =====================
-    with st.expander("➕ Nova Tarefa", expanded=False):
-        titulo = st.text_input("Título da tarefa", key="titulo_novo")
-        descricao = st.text_area("Descrição (opcional)", key="descricao_novo")
-        data_limite = st.date_input("Data limite", key="data_limite_novo")
-
-        if st.button("Salvar Tarefa", use_container_width=True, key="btn_salvar_novo"):
-            if titulo.strip() != "":
-                add_task(user["email"], titulo, descricao, data_limite.strftime("%Y-%m-%d"))
-                st.success("✅ Tarefa adicionada com sucesso!")
-                time.sleep(1)
-                st.rerun()
-            else:
-                st.error("❌ O título da tarefa é obrigatório.")
-
-    st.divider()
-
-    # =====================
-    # Exibir tarefas em blocos dinâmicos
-    # =====================
-    if not tasks:
-        st.info("Nenhuma tarefa encontrada. Crie uma nova para começar!")
-        return
-
-    st.markdown("<div class='task-grid'>", unsafe_allow_html=True)
-
-    for i, task in enumerate(tasks):
-        cor_card = "#F0F4FF" if i % 2 == 0 else "#F9F9F9"
-        status = "✅ Concluída" if task.get("concluida") else "⏳ Pendente"
-        cor_status = "#A8D5BA" if task.get("concluida") else "#FFDBA4"
-
-        bloco_html = f"""
-        <div class='task-card' style='background-color:{cor_card}; border-left: 6px solid {cor_status};'>
-            <h4>{task.get('titulo')}</h4>
-            <p>{task.get('descricao', '')}</p>
-            <p><b>Status:</b> {status}</p>
-            <p><b>Data Limite:</b> {task.get('data_limite', '---')}</p>
-        </div>
-        """
-        st.markdown(bloco_html, unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns([1, 1, 2])
-        with col1:
-            if st.button("Concluir", key=f"done_{i}"):
-                update_task(user["email"], task["id"], {"concluida": True})
-                st.rerun()
-        with col2:
-            if st.button("Excluir", key=f"del_{i}"):
-                delete_task(user["email"], task["id"])
-                st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # =====================
-    # Rodapé
-    # =====================
-    st.divider()
-    st.markdown("<p style='text-align:center; color:gray;'>Organize seu foco, avance com tranquilidade 🌿</p>", unsafe_allow_html=True)
-
+    """Dashboard principal com visualização de tarefas em blocos"""
+    
+    # Header
+    st.markdown('<div class="page-header">Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Visão geral das suas tarefas</div>', unsafe_allow_html=True)
+    
     # Estatísticas rápidas
     stats = get_user_stats(st.session_state.current_user["id"])
     
