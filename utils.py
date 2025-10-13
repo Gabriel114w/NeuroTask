@@ -69,7 +69,7 @@ def migrate_password(user_id: str, email: str, password: str, old_hash: str) -> 
 # =============================
 # User Management Functions
 # =============================
-def create_user(username: str, email: str, password: str) -> dict:
+def create_user(username: str, email: str, password: str, theme: str = "light_lavender") -> dict:
     """Create a new user"""
     if not supabase:
         raise Exception("Banco de dados não disponível")
@@ -80,7 +80,7 @@ def create_user(username: str, email: str, password: str) -> dict:
             "username": username,
             "email": email,
             "password": hashed_password,
-            "theme_settings": {}
+            "theme_settings": {"current_theme": theme}
         }
         
         result = supabase.table("users").insert(data).execute()
