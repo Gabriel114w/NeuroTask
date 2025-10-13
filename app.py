@@ -4,7 +4,7 @@ from datetime import datetime
 from utils import (
     get_user_by_email, get_user_by_username, create_user, update_user, delete_user,
     get_tasks, add_task, update_task, delete_task,
-    send_task_notification, verify_password, migrate_password
+    send_task_notification, verify_password, migrate_password, get_pending_tasks
 )
 
 # =============================
@@ -22,7 +22,6 @@ def init_session_state():
     if 'show_profile' not in st.session_state:
         st.session_state.show_profile = False
     if 'current_theme' not in st.session_state:
-        # O tema inicial será definido na função principal, carregando do banco ou usando um padrão
         st.session_state.current_theme = "light_lavender" 
     if 'layout_mode' not in st.session_state:
         st.session_state.layout_mode = "desktop"
@@ -34,18 +33,15 @@ def init_session_state():
 # =============================
 # Theme Configuration - Cores Suaves e Pastéis
 # =============================
-# Paletas recomendadas para TDAH tendem a ser suaves, de baixo contraste e com cores que não distraem.
-# O lavanda/roxo claro (#D7C4F3) é frequentemente associado à calma e foco.
 THEMES = {
-    # 1. Paleta Lavanda (Substitui a Azul) - Cor solicitada: #D7C4F3
     "light_lavender": {
         "name": "Lavanda Claro (Foco)",
-        "primary": "#F3E5F5", # Roxo muito claro
-        "secondary": "#E1BEE7", # Roxo claro
-        "accent": "#D7C4F3", # Cor solicitada (Lavanda)
+        "primary": "#F3E5F5",
+        "secondary": "#E1BEE7",
+        "accent": "#D7C4F3",
         "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#4A148C", # Roxo escuro para contraste suave
+        "text": "#4A148C",
         "text_secondary": "#7B1FA2",
         "success": "#A5D6A7",
         "warning": "#FFE082",
@@ -54,15 +50,14 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.08)",
         "hover": "#F5F5F5"
     },
-    # 2. Paleta Verde Menta (Nova Paleta Clara) - Calmante
     "light_mint": {
         "name": "Menta Claro (Calma)",
-        "primary": "#E8F5E9", # Verde muito claro
-        "secondary": "#C8E6C9", # Verde claro
-        "accent": "#81C784", # Verde Menta
+        "primary": "#E8F5E9",
+        "secondary": "#C8E6C9",
+        "accent": "#81C784",
         "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#388E3C", # Verde escuro para contraste suave
+        "text": "#388E3C",
         "text_secondary": "#66BB6A",
         "success": "#A5D6A7",
         "warning": "#FFE082",
@@ -71,15 +66,14 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.08)",
         "hover": "#F5F5F5"
     },
-    # 3. Paleta Pêssego (Nova Paleta Clara) - Acolhedora
     "light_peach": {
         "name": "Pêssego Claro (Acolhedor)",
-        "primary": "#FFF3E0", # Laranja muito claro
-        "secondary": "#FFE0B2", # Laranja claro
-        "accent": "#FFB74D", # Pêssego/Laranja Suave
+        "primary": "#FFF3E0",
+        "secondary": "#FFE0B2",
+        "accent": "#FFB74D",
         "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#E65100", # Laranja escuro para contraste suave
+        "text": "#E65100",
         "text_secondary": "#FF9800",
         "success": "#C5E1A5",
         "warning": "#FFCC80",
@@ -88,15 +82,14 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.08)",
         "hover": "#FFF8F0"
     },
-    # 4. Paleta Lavanda Escura (Substitui a Azul Escura)
     "dark_lavender": {
         "name": "Lavanda Escuro (Foco)",
-        "primary": "#311B92", # Roxo escuro
-        "secondary": "#4527A0", # Roxo um pouco mais claro
-        "accent": "#D7C4F3", # Cor solicitada (Lavanda)
+        "primary": "#311B92",
+        "secondary": "#4527A0",
+        "accent": "#D7C4F3",
         "background": "#1A1A1A",
         "surface": "#263238",
-        "text": "#E1BEE7", # Roxo claro para texto
+        "text": "#E1BEE7",
         "text_secondary": "#CE93D8",
         "success": "#81C784",
         "warning": "#FFD54F",
@@ -105,15 +98,14 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.3)",
         "hover": "#2C393F"
     },
-    # 5. Paleta Verde Escuro (Nova Paleta Escura) - Calmante
     "dark_mint": {
         "name": "Menta Escuro (Calma)",
-        "primary": "#1B5E20", # Verde escuro
-        "secondary": "#2E7D32", # Verde um pouco mais claro
-        "accent": "#A5D6A7", # Verde Menta Claro
+        "primary": "#1B5E20",
+        "secondary": "#2E7D32",
+        "accent": "#A5D6A7",
         "background": "#1A1A1A",
         "surface": "#263238",
-        "text": "#C8E6C9", # Verde claro para texto
+        "text": "#C8E6C9",
         "text_secondary": "#A5D6A7",
         "success": "#81C784",
         "warning": "#FFD54F",
@@ -122,7 +114,6 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.3)",
         "hover": "#2C393F"
     },
-    # 6. Paleta Marrom Escuro (Nova Paleta Escura) - Acolhedora
     "dark_brown": {
         "name": "Marrom Escuro (Acolhedor)",
         "primary": "#3E2723",
@@ -443,13 +434,13 @@ def apply_theme_css():
     
     /* Login Screen Specific Styles */
     .login-container {{
-        background-color: {theme['surface']};
+        background-color: transparent; /* Fundo transparente para não criar uma caixa branca */
         padding: 40px;
         border-radius: 16px;
-        box-shadow: 0 10px 30px {theme['shadow']};
+        box-shadow: none; /* Sem sombra */
         max-width: 400px;
         margin: 80px auto;
-        border: 1px solid {theme['border']};
+        border: none; /* Sem borda */
     }}
     
     .login-header {{
@@ -504,14 +495,11 @@ def get_user_stats(user_id):
 # Screen Functions
 # =============================
 def tela_login():
-    # Aplica o tema padrão ou o último tema salvo (se houver)
-    # A lógica de carregar o tema persistente será adicionada na função principal
     apply_theme_css() 
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        # Usando as novas classes CSS para destaque
         st.markdown('<div class="login-container">', unsafe_allow_html=True)
         st.markdown('<div class="login-header">NeuroTask</div>', unsafe_allow_html=True)
         st.markdown('<div class="login-slogan">Organize suas tarefas com foco e clareza</div>', unsafe_allow_html=True)
@@ -530,13 +518,11 @@ def tela_login():
                 user = get_user_by_email(email.lower())
                 
                 if user and verify_password(senha, user.get("password", "")):
-                    # Migrar senha se necessário (para compatibilidade)
                     if not user.get("password", "").startswith('$2b$'):
                         migrate_password(user["id"], email.lower(), senha, user.get("password", ""))
                     
                     st.session_state.current_user = user
                     
-                    # Carregar tema persistente do usuário
                     saved_theme = user.get("theme_settings", {}).get("current_theme")
                     if saved_theme and saved_theme in THEMES:
                         st.session_state.current_theme = saved_theme
@@ -548,7 +534,7 @@ def tela_login():
                 else:
                     st.error("Email ou senha incorretos")
         
-        st.markdown("---")
+        st.markdown("--")
         if st.button("Criar Nova Conta", use_container_width=True):
             st.session_state.current_screen = "register"
             st.rerun()
@@ -587,7 +573,6 @@ def tela_registro():
                     return
                 
                 try:
-                    # Ao criar o usuário, o tema padrão será light_lavender
                     novo = create_user(usuario, email.lower(), senha, theme="light_lavender")
                     if novo:
                         st.success("Registro bem-sucedido! Faça login.")
@@ -597,7 +582,7 @@ def tela_registro():
                 except Exception as e:
                     st.error(f"Erro ao criar conta: {str(e)}")
         
-        st.markdown("---")
+        st.markdown("--")
         if st.button("Voltar", use_container_width=True):
             st.session_state.current_screen = "login"
             st.rerun()
@@ -607,11 +592,9 @@ def tela_registro():
 # =============================
 def mostrar_menu_lateral():
     with st.sidebar:
-        # Header do usuário
         user = st.session_state.current_user
         st.markdown(f'<div class="page-header" style="font-size: 20px; margin-bottom: 8px;">Olá, {user.get("username", "Usuário")}</div>', unsafe_allow_html=True)
         
-        # Estatísticas rápidas
         stats = get_user_stats(user["id"])
         
         col1, col2 = st.columns(2)
@@ -622,7 +605,6 @@ def mostrar_menu_lateral():
         
         st.markdown('<div class="section-title" style="margin-top: 32px;">Menu</div>', unsafe_allow_html=True)
         
-        # Menu de navegação
         if st.button("Nova Tarefa", use_container_width=True, key="btn_nova_tarefa"):
             st.session_state.show_task_form = True
             st.session_state.task_to_edit = None
@@ -653,18 +635,15 @@ def mostrar_menu_lateral():
             st.session_state.current_screen = "settings"
             st.rerun()
         
-        st.markdown("---")
+        st.markdown("--")
         
-        # Layout toggle
         layout_text = "Modo Mobile" if st.session_state.layout_mode == "desktop" else "Modo Desktop"
         
         if st.button(layout_text, use_container_width=True, key="btn_layout"):
             st.session_state.layout_mode = "mobile" if st.session_state.layout_mode == "desktop" else "desktop"
             st.rerun()
         
-        # Logout
         if st.button("Sair", use_container_width=True, key="btn_sair"):
-            # Salvar o tema atual antes de sair
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": st.session_state.current_theme}})
             
@@ -704,9 +683,8 @@ def mostrar_perfil():
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("--")
     
-    # Zona de perigo
     st.markdown("### Zona de Perigo")
     st.warning("**Atenção:** Esta ação é irreversível!")
     
@@ -744,69 +722,55 @@ def tela_configuracoes():
     
     st.markdown("### Escolher Tema")
     
-    # Temas claros
     st.markdown("#### Temas Claros")
     col1, col2, col3 = st.columns(3)
     
-    # light_lavender
     with col1:
         if st.button(THEMES["light_lavender"]["name"], use_container_width=True):
             st.session_state.current_theme = "light_lavender"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "light_lavender"}})
             st.rerun()
     
-    # light_mint
     with col2:
         if st.button(THEMES["light_mint"]["name"], use_container_width=True):
             st.session_state.current_theme = "light_mint"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "light_mint"}})
             st.rerun()
             
-    # light_peach
     with col3:
         if st.button(THEMES["light_peach"]["name"], use_container_width=True):
             st.session_state.current_theme = "light_peach"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "light_peach"}})
             st.rerun()
     
-    # Temas escuros
     st.markdown("#### Temas Escuros")
     col4, col5, col6 = st.columns(3)
     
-    # dark_lavender
     with col4:
         if st.button(THEMES["dark_lavender"]["name"], use_container_width=True):
             st.session_state.current_theme = "dark_lavender"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "dark_lavender"}})
             st.rerun()
     
-    # dark_mint
     with col5:
         if st.button(THEMES["dark_mint"]["name"], use_container_width=True):
             st.session_state.current_theme = "dark_mint"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "dark_mint"}})
             st.rerun()
             
-    # dark_brown
     with col6:
         if st.button(THEMES["dark_brown"]["name"], use_container_width=True):
             st.session_state.current_theme = "dark_brown"
-            # Salvar tema no banco de dados
             if st.session_state.current_user:
                 update_user(st.session_state.current_user["email"], {"theme_settings": {"current_theme": "dark_brown"}})
             st.rerun()
     
-    st.markdown("---")
+    st.markdown("--")
     
     st.markdown(f"**Tema Atual:** {THEMES[st.session_state.current_theme]['name']}")
     st.markdown(f"**Modo de Layout:** {st.session_state.layout_mode.title()}")
@@ -819,8 +783,6 @@ def tela_configuracoes():
 # Task Management
 # =============================
 def render_task_card(tarefa, container_type="normal"):
-    """Renderiza um card de tarefa com visual otimizado"""
-    
     priority_class = ""
     if tarefa.get("priority") == "high":
         priority_class = "task-priority-high"
@@ -839,7 +801,6 @@ def render_task_card(tarefa, container_type="normal"):
         col1, col2, col3 = st.columns([0.5, 5, 1.5])
         
         with col1:
-            # Checkbox para marcar como concluída
             concluida = st.checkbox(
                 "✓", 
                 value=tarefa.get("completed", False), 
@@ -859,7 +820,6 @@ def render_task_card(tarefa, container_type="normal"):
             meta_items = []
             if tarefa.get("due_date"):
                 try:
-                    # Formatar a data para exibição
                     date_obj = datetime.strptime(tarefa["due_date"], "%Y-%m-%d")
                     formatted_date = date_obj.strftime("%d/%m/%Y")
                     meta_items.append(f'<span class="task-meta-item">📅 {formatted_date}</span>')
@@ -876,7 +836,6 @@ def render_task_card(tarefa, container_type="normal"):
             st.markdown(f'<div class="task-meta">{"".join(meta_items)}</div>', unsafe_allow_html=True)
             
         with col3:
-            # Botões de ação
             col_edit, col_delete = st.columns(2)
             
             with col_edit:
@@ -927,16 +886,7 @@ def task_form():
                 index=["single", "daily"].index(task_data.get("type", "single"))
             )
         
-        col_submit, col_cancel = st.columns(2)
-        
-        with col_submit:
-            submit_button = st.form_submit_button("Salvar Tarefa" if is_edit else "Adicionar Tarefa", use_container_width=True)
-        
-        with col_cancel:
-            if st.button("Cancelar", key="cancel_task_form", use_container_width=True):
-                st.session_state.show_task_form = False
-                st.session_state.task_to_edit = None
-                st.rerun()
+        submit_button = st.form_submit_button("Salvar Tarefa" if is_edit else "Adicionar Tarefa", use_container_width=True)
         
         if submit_button:
             if not title:
@@ -948,7 +898,7 @@ def task_form():
                 "description": description,
                 "due_date": due_date_str_final,
                 "type": task_type,
-                "priority": priority # priority é usado apenas no app, não no banco
+                "priority": priority
             }
             
             if is_edit:
@@ -961,6 +911,11 @@ def task_form():
             st.session_state.show_task_form = False
             st.session_state.task_to_edit = None
             st.rerun()
+            
+    if st.button("Cancelar", key="cancel_task_form_outside", use_container_width=True):
+        st.session_state.show_task_form = False
+        st.session_state.task_to_edit = None
+        st.rerun()
 
 def dashboard_screen():
     apply_theme_css()
@@ -982,7 +937,6 @@ def dashboard_screen():
     st.markdown(f'<div class="page-header">Dashboard</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="page-subtitle">Bem-vindo(a) de volta, {user.get("username", "Usuário")}!</div>', unsafe_allow_html=True)
     
-    # Estatísticas
     stats = get_user_stats(user["id"])
     
     col1, col2, col3 = st.columns(3)
@@ -998,7 +952,6 @@ def dashboard_screen():
     pending_tasks = get_pending_tasks(user["id"])
     
     if pending_tasks:
-        # Ordenar por prioridade (high, medium, low) e depois por data
         priority_order = {"high": 3, "medium": 2, "low": 1}
         sorted_tasks = sorted(pending_tasks, key=lambda x: (priority_order.get(x.get("priority", "medium"), 0), x.get("due_date", "9999-12-31")), reverse=True)
         
@@ -1021,7 +974,6 @@ def pending_tasks_screen():
     pending_tasks = get_pending_tasks(user["id"])
     
     if pending_tasks:
-        # Ordenar por prioridade (high, medium, low) e depois por data
         priority_order = {"high": 3, "medium": 2, "low": 1}
         sorted_tasks = sorted(pending_tasks, key=lambda x: (priority_order.get(x.get("priority", "medium"), 0), x.get("due_date", "9999-12-31")), reverse=True)
         
@@ -1040,9 +992,7 @@ def main():
     st.set_page_config(layout="wide", page_title="NeuroTask - Foco e Clareza")
     init_session_state()
     
-    # Lógica para carregar o tema padrão antes de qualquer tela
     if st.session_state.current_user is None:
-        # Se não estiver logado, tenta aplicar o tema padrão (light_lavender)
         if 'current_theme' not in st.session_state:
             st.session_state.current_theme = "light_lavender"
         apply_theme_css()
@@ -1052,7 +1002,6 @@ def main():
         elif st.session_state.current_screen == "register":
             tela_registro()
     else:
-        # Se estiver logado, o tema já foi carregado na tela de login
         apply_theme_css()
         mostrar_menu_lateral()
         
@@ -1063,7 +1012,7 @@ def main():
         elif st.session_state.current_screen == "settings":
             tela_configuracoes()
         else:
-            dashboard_screen() # Default
+            dashboard_screen()
 
 if __name__ == "__main__":
     main()
