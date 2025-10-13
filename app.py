@@ -438,7 +438,7 @@ def apply_theme_css():
         padding: 40px;
         border-radius: 16px;
         box-shadow: none; /* Sem sombra */
-        max-width: 400px;
+        max-width: 500px;
         margin: 80px auto;
         border: none; /* Sem borda */
     }}
@@ -611,7 +611,7 @@ def mostrar_menu_lateral():
             st.session_state.current_screen = "dashboard"
             st.rerun()
         
-        if st.button("Dashboard", use_container_width=True, key="btn_dashboard"):
+        if st.button("Início", use_container_width=True, key="btn_dashboard"):
             st.session_state.show_task_form = False
             st.session_state.show_profile = False
             st.session_state.current_screen = "dashboard"
@@ -709,7 +709,7 @@ def mostrar_perfil():
                 st.session_state.confirm_delete = False
                 st.rerun()
     
-    if st.button("Voltar ao Dashboard"):
+    if st.button("Voltar ao Início"):
         st.session_state.show_profile = False
         st.session_state.current_screen = "dashboard"
         st.rerun()
@@ -775,7 +775,7 @@ def tela_configuracoes():
     st.markdown(f"**Tema Atual:** {THEMES[st.session_state.current_theme]['name']}")
     st.markdown(f"**Modo de Layout:** {st.session_state.layout_mode.title()}")
     
-    if st.button("Voltar ao Dashboard"):
+    if st.button("Voltar ao Início"):
         st.session_state.current_screen = "dashboard"
         st.rerun()
 
@@ -862,15 +862,34 @@ def task_form():
         title = st.text_input("Título da Tarefa", value=task_data.get("title", ""), placeholder="O que precisa ser feito?")
         description = st.text_area("Descrição (Opcional)", value=task_data.get("description", ""), placeholder="Detalhes, sub-tarefas, notas...")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            due_date_str = task_data.get("due_date")
-            initial_date = datetime.strptime(due_date_str, "%Y-%m-%d").date() if due_date_str else None
+            # Data
+            due_date_full = task_data.get("due_date")
+            initial_date = None
+            initial_time = None
+            
+            if due_date_full:
+                try:
+                    # Tenta parsear como datetime (com hora)
+                    dt_obj = datetime.strptime(due_date_full, "%Y-%m-%d %H:%M")
+                    initial_date = dt_obj.date()
+                    initial_time = dt_obj.time()
+                except ValueError:
+                    try:
+                        # Tenta parsear como date (sem hora)
+                        initial_date = datetime.strptime(due_date_full, "%Y-%m-%d").date()
+                    except ValueError:
+                        pass
+            
             due_date = st.date_input("Data Limite (Opcional)", value=initial_date)
-            due_date_str_final = due_date.strftime("%Y-%m-%d") if due_date else ""
             
         with col2:
+            # Hora (Opcional)
+            due_time = st.time_input("Hora (Opcional)", value=initial_time)
+            
+        with col3:
             priority = st.selectbox(
                 "Prioridade",
                 options=["low", "medium", "high"],
@@ -878,7 +897,7 @@ def task_form():
                 index=["low", "medium", "high"].index(task_data.get("priority", "medium"))
             )
             
-        with col3:
+        with col4:
             task_type = st.selectbox(
                 "Tipo",
                 options=["single", "daily"],
@@ -892,7 +911,12 @@ def task_form():
             if not title:
                 st.error("O título da tarefa é obrigatório.")
                 return
-            
+            due_date_str_final = ""
+            if due_date:
+                due_date_str_final = due_date.strftime("%Y-%m-%d")
+                if due_time:
+                    due_date_str_final += due_time.strftime(" %H:%M")
+                    
             updates = {
                 "title": title,
                 "description": description,
@@ -934,7 +958,7 @@ def dashboard_screen():
         tela_configuracoes()
         return
     
-    st.markdown(f'<div class="page-header">Dashboard</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="page-header">Início</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="page-subtitle">Bem-vindo(a) de volta, {user.get("username", "Usuário")}!</div>', unsafe_allow_html=True)
     
     stats = get_user_stats(user["id"])
@@ -981,7 +1005,7 @@ def pending_tasks_screen():
             render_task_card(task, container_type="pending")
     else:
         st.info("Nenhuma tarefa pendente. Ótimo trabalho!")
-        if st.button("Voltar ao Dashboard"):
+        if st.button("Voltar ao Início"):
             st.session_state.current_screen = "dashboard"
             st.rerun()
 
