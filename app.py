@@ -864,7 +864,7 @@ def render_task_card(tarefa, container_type="normal"):
             
             priority_map = {
                 "high": f'<span class="priority-badge priority-high">Alta</span>',
-                "medium": f'<span class="priority-badge priority-medium"><b>Média</b></span>',
+                "medium": f'<span class="priority-badge priority-medium">Média</span>',
                 "low": f'<span class="priority-badge priority-low">Baixa</span>'
             }
             
