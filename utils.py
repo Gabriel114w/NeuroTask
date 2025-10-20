@@ -103,19 +103,3 @@ def delete_task(task_id: str):
     except Exception as e:
         print(f"[delete_task] Erro: {e}")
         return False
-
-
-# ---------------------------------------------------------
-# Funções relacionadas ao usuário
-# ---------------------------------------------------------
-def get_user_by_email(email: str):
-    """Busca um usuário pelo e-mail."""
-    if not supabase:
-        return None
-
-    try:
-        result = supabase.table("users").select("*").eq("email", email).limit(1).execute()
-        return result.data[0] if result.data else None
-    except Exception as e:
-        print(f"[get_user_by_email] Erro: {e}")
-        return None
