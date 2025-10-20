@@ -5,7 +5,6 @@ from utils import (
     add_task,
     update_task,
     delete_task,
-    get_user_by_email,
 )
 from supabase_client import sign_in_user, sign_up_user
 
