@@ -1,0 +1,5 @@
+[server]
+# Desabilita o watcher de arquivos para evitar o erro "inotify watch limit reached"
+# Isso é comum em ambientes de hospedagem como o Streamlit Cloud.
+# A aplicação precisará ser reiniciada manualmente para ver as mudanças de código.
+fileWatcherType = "none"
