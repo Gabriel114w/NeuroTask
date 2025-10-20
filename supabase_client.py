@@ -43,10 +43,14 @@ def sign_in_user(email: str, password: str):
         return None
 
     try:
+        # A função sign_in_with_password lança uma exceção se as credenciais forem inválidas.
+        # Se for bem-sucedida, retorna um objeto com 'user' e 'session'.
         result = supabase.auth.sign_in_with_password({"email": email, "password": password})
         user_data = result.user
         if not user_data:
-            print("[sign_in_user] Usuário não encontrado.")
+            # Isso é um caso de falha, mas a exceção já teria sido lançada.
+            # Mantemos o retorno None por segurança.
+            print("[sign_in_user] Falha ao obter dados do usuário após login.")
             return None
 
         return {
@@ -56,9 +60,9 @@ def sign_in_user(email: str, password: str):
         }
 
     except Exception as e:
-        print(f"[sign_in_user] Erro: {e}")
+        # A biblioteca do Supabase lança uma exceção em caso de falha de autenticação (e-mail/senha incorretos)
+        print(f"[sign_in_user] Erro de autenticação: {e}")
         return None
-
 
 def sign_up_user(email: str, password: str):
     """Cria um novo usuário (cadastro)."""
@@ -67,7 +71,10 @@ def sign_up_user(email: str, password: str):
         return None
 
     try:
+        # O Supabase Auth lida com o hashing da senha automaticamente.
+        # A função sign_up lança uma exceção se o e-mail já estiver em uso.
         result = supabase.auth.sign_up({"email": email, "password": password})
+        # O método sign_up retorna um objeto com 'user' e 'session'
         user_data = result.user
         if not user_data:
             print("[sign_up_user] Falha ao criar usuário.")
@@ -80,9 +87,9 @@ def sign_up_user(email: str, password: str):
         }
 
     except Exception as e:
-        print(f"[sign_up_user] Erro: {e}")
+        # A biblioteca do Supabase lança uma exceção em caso de falha de cadastro (e-mail já existe, etc.)
+        print(f"[sign_up_user] Erro de cadastro: {e}")
         return None
-
 
 def get_current_user():
     """Obtém o usuário logado atual."""
