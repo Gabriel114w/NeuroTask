@@ -229,7 +229,8 @@ def apply_theme_css():
     .task-title {{
         font-size: 18px;
         font-weight: 600;
-        color: {theme['text']};
+        color: #000000; /* Força cor preta para o texto da prioridade Média */
+        font-weight: bold; /* Adiciona negrito via CSS */
         margin: 0 0 8px 0;
         line-height: 1.4;
     }}
@@ -270,17 +271,18 @@ def apply_theme_css():
     /* Cores de Prioridade Suaves - Badges */
     .priority-high {{
         background: {theme['error']};
-        color: {theme['text']}; /* Texto escuro para contraste suave */
+        color: {theme["text"]}; /* Texto escuro para contraste suave */
     }}
     
     .priority-medium {{
         background: {theme['warning']};
-        color: {theme['text']};
+        color: #000000;
+        font-weight: bold;
     }}
     
     .priority-low {{
         background: {theme['success']};
-        color: {theme['text']}; /* Texto escuro para contraste suave */
+        color: {theme["text"]}; /* Texto escuro para contraste suave */
     }}
     
     /* Stats Cards */
@@ -864,7 +866,7 @@ def render_task_card(tarefa, container_type="normal"):
             
             priority_map = {
                 "high": f'<span class="priority-badge priority-high">Alta</span>',
-                "medium": f'<span class="priority-badge priority-medium">Média</span>',
+                "medium": f'<span class="priority-badge priority-medium"><b>Média</b></span>',
                 "low": f'<span class="priority-badge priority-low">Baixa</span>'
             }
             
