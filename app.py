@@ -569,7 +569,6 @@ def tela_registro():
         st.markdown('<p class="page-subtitle" style="text-align: center;">Criar Nova Conta</p>', unsafe_allow_html=True)
         
         with st.form("register_form"):
-     
             usuario = st.text_input("Nome de Usuário", placeholder="Escolha um nome de usuário")
             email = st.text_input("Email", placeholder="seu@email.com")
             senha = st.text_input("Senha", type="password", placeholder="Escolha uma senha")
