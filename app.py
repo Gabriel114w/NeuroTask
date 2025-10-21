@@ -24,7 +24,7 @@ def init_session_state():
     if 'current_theme' not in st.session_state:
         st.session_state.current_theme = "light_lavender" 
     if 'layout_mode' not in st.session_state:
-        st.session_state.layout_mode = "desktop"
+
     if 'filter_priority' not in st.session_state:
         st.session_state.filter_priority = "all"
     if 'filter_sort' not in st.session_state:
@@ -34,7 +34,7 @@ def init_session_state():
     if 'show_tutorial' not in st.session_state:
         st.session_state.show_tutorial = False
 
-        st.session_state.layout_mode = "desktop"
+
     if 'sidebar_expanded' not in st.session_state:
         st.session_state.sidebar_expanded = True
     if 'confirm_delete' not in st.session_state:
