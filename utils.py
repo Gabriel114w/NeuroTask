@@ -157,19 +157,15 @@ def get_tasks(user_id: str) -> list:
         result = supabase.table("tasks").select("*").eq("user_id", user_id).execute()
         tasks = result.data or []
         
-        # Adicionar priority como 'medium' para compatibilidade com o app
-        for task in tasks:
-            if 'priority' not in task:
-                task['priority'] = 'medium'
+
         
         return tasks
     except Exception as e:
         print(f"Erro ao buscar tarefas: {e}")
         return []
 
-def add_task(user_id: str, title: str, description: str = "", due_date: str = "", 
-             type: str = "single", priority: str = "medium") -> dict:
-    """Add a new task (priority é ignorado pois não existe no banco)"""
+def add_task(user_id: str, title: str, description: str = "", due_date: str = "", type: str = "single", priority: str = "medium") -> dict:
+    """Add a new task"""
     if not supabase:
         return None
     
@@ -180,38 +176,27 @@ def add_task(user_id: str, title: str, description: str = "", due_date: str = ""
             "description": description,
             "due_date": due_date,
             "type": type,
-            "completed": False
+            "completed": False,
+            "priority": priority
         }
         
         result = supabase.table("tasks").insert(data).execute()
         
         if result.data:
-            task = result.data[0]
-            # Adicionar priority para compatibilidade
-            task['priority'] = priority
-            return task
+            return result.data[0]
         return None
     except Exception as e:
         print(f"Erro ao adicionar tarefa: {e}")
         return None
-
-def update_task(task_id: str, updates: dict) -> dict:
     """Update a task"""
     if not supabase:
         return None
     
     try:
-        # Remover priority dos updates pois não existe no banco
-        updates_clean = {k: v for k, v in updates.items() if k != 'priority'}
-        
-        result = supabase.table("tasks").update(updates_clean).eq("id", task_id).execute()
+        result = supabase.table("tasks").update(updates).eq("id", task_id).execute()
         
         if result.data:
-            task = result.data[0]
-            # Adicionar priority para compatibilidade
-            if 'priority' not in task:
-                task['priority'] = updates.get('priority', 'medium')
-            return task
+            return result.data[0]
         return None
     except Exception as e:
         print(f"Erro ao atualizar tarefa: {e}")
@@ -239,8 +224,7 @@ def get_pending_tasks(user_id: str) -> list:
         tasks = result.data or []
         
         for task in tasks:
-            if 'priority' not in task:
-                task['priority'] = 'medium'
+
         
         return tasks
     except Exception as e:
@@ -257,8 +241,7 @@ def get_completed_tasks(user_id: str) -> list:
         tasks = result.data or []
         
         for task in tasks:
-            if 'priority' not in task:
-                task['priority'] = 'medium'
+
         
         return tasks
     except Exception as e:
@@ -268,8 +251,15 @@ def get_completed_tasks(user_id: str) -> list:
 
 
 def get_tasks_by_priority(user_id: str, priority: str) -> list:
-    """Get tasks by priority (retorna todas pois não há coluna priority)"""
-    return get_tasks(user_id)
+    """Get tasks by priority"""
+    if not supabase:
+        return []
+    try:
+        result = supabase.table("tasks").select("*").eq("user_id", user_id).eq("priority", priority).execute()
+        return result.data or []
+    except Exception as e:
+        print(f"Erro ao buscar tarefas por prioridade: {e}")
+        return []
 
 def get_daily_tasks(user_id: str) -> list:
     """Get daily tasks"""
@@ -281,8 +271,7 @@ def get_daily_tasks(user_id: str) -> list:
         tasks = result.data or []
         
         for task in tasks:
-            if 'priority' not in task:
-                task['priority'] = 'medium'
+
         
         return tasks
     except Exception as e:
@@ -310,8 +299,7 @@ def get_due_tasks(user_id: str) -> list:
         tasks = result.data or []
         
         for task in tasks:
-            if 'priority' not in task:
-                task['priority'] = 'medium'
+
         
         return tasks
     except Exception as e:
