@@ -114,22 +114,22 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.3)",
         "hover": "#2C393F"
     },
-    "dark_mint": {
-        "name": "Menta Escuro (Calma)",
-        "primary": "#1B5E20",
-        "secondary": "#2E7D32",
-        "accent": "#A5D6A7",
-        "background": "#1A1A1A",
-        "surface": "#263238",
-        "text": "#C8E6C9",
-        "text_secondary": "#A5D6A7",
-        "success": "#81C784",
-        "warning": "#FFD54F",
-        "error": "#E57373",
-        "border": "#37474F",
-        "shadow": "rgba(0, 0, 0, 0.3)",
-        "hover": "#2C393F"
-    },
+  "dark_mint": {
+    "name": "Menta Escuro (Calma)",
+    "primary": "#2E7D32",
+    "secondary": "#66BB6A",
+    "accent": "#A5D6A7",
+    "background": "#121212",
+    "surface": "#1E272C",
+    "text": "#E0F2F1",
+    "text_secondary": "#B2DFDB",
+    "success": "#81C784",
+    "warning": "#FFD54F",
+    "error": "#E57373",
+    "border": "#455A64",
+    "shadow": "rgba(0, 0, 0, 0.5)",
+    "hover": "#37474F"
+},
     "dark_brown": {
         "name": "Marrom Escuro (Acolhedor)",
         "primary": "#3E2723",
