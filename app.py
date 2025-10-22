@@ -114,21 +114,21 @@ THEMES = {
         "shadow": "rgba(0, 0, 0, 0.3)",
         "hover": "#2C393F"
     },
-  "dark_mint": {
+ "dark_mint": {
     "name": "Menta Escuro (Calma)",
-    "primary": "#2E7D32",
-    "secondary": "#66BB6A",
-    "accent": "#A5D6A7",
+    "primary": "#145A1A",
+    "secondary": "#1C7A2A",
+    "accent": "#81C784",
     "background": "#121212",
     "surface": "#1E272C",
     "text": "#E0F2F1",
     "text_secondary": "#B2DFDB",
-    "success": "#81C784",
+    "success": "#66BB6A",
     "warning": "#FFD54F",
     "error": "#E57373",
-    "border": "#455A64",
+    "border": "#37474F",
     "shadow": "rgba(0, 0, 0, 0.5)",
-    "hover": "#37474F"
+    "hover": "#263238"
 },
     "dark_brown": {
         "name": "Marrom Escuro (Acolhedor)",
