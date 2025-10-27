@@ -944,7 +944,7 @@ def task_form():
                 "Prioridade",
                 options=priority_options,
                 format_func=lambda x: priority_labels.get(x, x.capitalize()),
-                index=priority_options.index(task_data.get("priority", "medium"))
+                index=priority_options.index(task_data.get("priority", "medium")), key="priority_select"
             )
             
         with col4:
@@ -1203,6 +1203,22 @@ def completed_tasks_screen():
 # =============================
 def main():
     st.set_page_config(layout="wide", page_title="NeuroTask - Foco e Clareza")
+    
+    # Inclusão do Manifest e Service Worker para PWA
+    st.markdown("""
+        <link rel="manifest" href="/static/manifest.json">
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/static/service-worker.js').then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+        </script>
+    """, unsafe_allow_html=True)
     init_session_state()
     
     if st.session_state.current_user is None:
