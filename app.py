@@ -351,126 +351,147 @@ def apply_theme_css():
     /* Buttons */
     .stButton button {{
         background-color: {theme['accent']};
-        color: {theme['text']};
+        color: white;
         border: none;
-        padding: 10px 20px;
         border-radius: 8px;
-        font-weight: 600;
+        padding: 12px 24px;
+        font-weight: 500;
+        font-size: 14px;
         transition: all 0.2s ease;
+        width: 100%;
     }}
     
     .stButton button:hover {{
-        background-color: {theme['secondary']};
+        background-color: {theme['accent']};
+        opacity: 0.9;
         transform: translateY(-1px);
-        box-shadow: 0 2px 4px {theme['shadow']};
-    }}
-    
-    /* Input Fields */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea {{
-        background-color: {theme['primary']};
-        border: 1px solid {theme['border']};
-        color: {theme['text']};
-        border-radius: 8px;
-        padding: 10px;
-    }}
-    
-    /* Selectboxes */
-    .stSelectbox > div > div > div > div {{
-        background-color: {theme['primary']};
-        border: 1px solid {theme['border']};
-        color: {theme['text']};
-        border-radius: 8px;
-        padding: 10px;
+        box-shadow: 0 4px 12px {theme['shadow']};
     }}
     
     /* Sidebar */
-    .css-1d3f9sd, .css-1lcbmhc {{
+    div[data-testid="stSidebarContent"] {{
         background-color: {theme['surface']};
+        border-right: 1px solid {theme['border']};
     }}
     
-    /* Login Container */
-    .login-container {{
-        max-width: 400px;
-        margin: 100px auto;
-        padding: 40px;
-        background: {theme['surface']};
-        border-radius: 16px;
-        box-shadow: 0 10px 30px {theme['shadow']};
+    /* Forms */
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {{
+        border-radius: 8px;
         border: 1px solid {theme['border']};
+        background-color: {theme['surface']};
+        color: {theme['text']};
+        padding: 12px;
+        font-size: 14px;
     }}
     
-    .login-header {{
-        font-size: 40px;
-        font-weight: 700;
-        color: {theme['accent']};
-        text-align: center;
-        margin-bottom: 8px;
-        letter-spacing: -1px;
+    .stTextInput input:focus, .stTextArea textarea:focus {{
+        border-color: {theme['accent']};
+        box-shadow: 0 0 0 2px {theme['primary']};
     }}
     
-    .login-slogan {{
-        font-size: 16px;
-        color: {theme['text_secondary']};
-        text-align: center;
-        margin-bottom: 30px;
+    /* Checkbox */
+    .stCheckbox {{
+        margin-top: 8px;
     }}
     
-    /* Custom Streamlit Overrides */
-    .st-emotion-cache-1r6r309 {{ /* stForm */
-        padding: 0;
-    }}
-    
-    /* Estilização para o Tutorial */
-    .tutorial-card {{
-        background: {theme['surface']};
-        border-radius: 12px;
-        padding: 32px;
-        box-shadow: 0 2px 8px {theme['shadow']};
-        border: 1px solid {theme['border']};
-        margin-top: 20px;
-    }}
-    
-    .tutorial-step {{
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid {theme['border']};
-    }}
-    
-    .tutorial-step:last-child {{
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }}
-    
-    .tutorial-step h3 {{
-        color: {theme['accent']};
-        font-weight: 600;
-        margin-top: 0;
-    }}
-    
-    .tutorial-step p {{
-        color: {theme['text_secondary']};
-    }}
-    
-    /* Responsividade para Mobile */
+    /* Mobile Responsive */
     @media (max-width: 768px) {{
         .block-container {{
             padding: 1rem 0.5rem;
         }}
-        .login-container {{
-            margin: 50px 10px;
-            padding: 20px;
+        
+        .task-card {{
+            padding: 16px;
+            margin: 12px 0;
         }}
-        .page-header {{
-            font-size: 24px;
+        
+        .task-title {{
+            font-size: 16px;
         }}
+        
         .stats-number {{
             font-size: 28px;
         }}
-        .task-card {{
-            padding: 15px;
+        
+        .page-header {{
+            font-size: 24px;
         }}
+    }}
+    
+    /* Notification */
+    .notification-popup {{
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: {theme['surface']};
+        color: {theme['text']};
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px {theme['shadow']};
+        border-left: 5px solid {theme['accent']};
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }}
+    
+    .notification-popup.show {{
+        opacity: 1;
+        transform: translateY(0);
+    }}
+    
+    .notification-title {{
+        font-weight: 600;
+        margin-bottom: 5px;
+    }}
+    
+    .notification-time {{
+        font-size: 12px;
+        color: {theme['text_secondary']};
+    }}
+    
+    /* Login Screen Specific Styles */
+    .login-container {{
+        background-color: transparent; /* Fundo transparente para não criar uma caixa branca */
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: none; /* Sem sombra */
+        max-width: 500px;
+        margin: 80px auto;
+        border: none; /* Sem borda */
+    }}
+    
+    .login-header {{
+        font-size: 40px;
+        font-weight: 800;
+        color: {theme['accent']}; /* Destaque com a cor de acento */
+        text-align: center;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 2px {theme['shadow']};
+    }}
+    
+    .login-slogan {{
+        font-size: 18px;
+        font-weight: 500;
+        color: {theme['text_secondary']};
+        text-align: center;
+        margin-bottom: 30px;
+        line-height: 1.4;
+    }}
+    
+    /* Streamlit Overrides */
+    div[data-testid="stAppViewBlockContainer"] {{
+        background-color: {theme['background']};
+    }}
+    
+    /* Fix for Streamlit's default header/footer */
+    header {{
+        background-color: transparent !important;
+    }}
+    
+    footer {{
+        visibility: hidden;
     }}
     
     </style>
@@ -676,6 +697,7 @@ def mostrar_perfil():
         st.markdown('<div class="profile-card">', unsafe_allow_html=True)
         st.markdown("### Estatísticas")
         st.markdown(f"**Total de Tarefas:** {stats['total']}")
+        st.markdown(f"**Tarefas Concluídas:** {stats['completed']}")
         st.markdown(f"**Tarefas Pendentes:** {stats['pending']}")
         st.markdown(f"**Taxa de Conclusão:** {stats['completion_rate']:.1f}%")
         
@@ -1182,38 +1204,21 @@ def completed_tasks_screen():
 def main():
     st.set_page_config(layout="wide", page_title="NeuroTask - Foco e Clareza")
     
-    # Inclusão do Manifest e Service Worker para PWA (Correção para o nome/ícone)
-    st.markdown(
-        """
+    # Inclusão do Manifest e Service Worker para PWA
+    st.markdown("""
+        <link rel="manifest" href="/static/manifest.json">
         <script>
-            // Função para injetar o link do manifest no <head> e registrar o Service Worker
-            function injectPWA() {
-                // 1. Injeta o link do manifest no <head>
-                if (!document.querySelector('link[rel="manifest"]')) {
-                    const link = document.createElement('link');
-                    link.rel = 'manifest';
-                    link.href = '/static/manifest.json';
-                    document.head.appendChild(link);
-                }
-
-                // 2. Registra o Service Worker
-                if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', function() {
-                        navigator.serviceWorker.register('/static/service-worker.js').then(function(registration) {
-                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                        }, function(err) {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/static/service-worker.js').then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
                     });
-                }
+                });
             }
-
-            // Garante que a injeção ocorra após o Streamlit carregar o DOM
-            injectPWA();
         </script>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
     init_session_state()
     
     if st.session_state.current_user is None:
@@ -1242,4 +1247,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
