@@ -180,7 +180,8 @@ def add_task(user_id: str, title: str, description: str = "", due_date: str = ""
             "description": description,
             "due_date": due_date,
             "type": type,
-            "completed": False
+            "completed": False,
+            "priority": priority
         }
         
         result = supabase.table("tasks").insert(data).execute()
@@ -201,10 +202,8 @@ def update_task(task_id: str, updates: dict) -> dict:
         return None
     
     try:
-        # Remover priority dos updates pois não existe no banco
-        updates_clean = {k: v for k, v in updates.items() if k != 'priority'}
-        
-        result = supabase.table("tasks").update(updates_clean).eq("id", task_id).execute()
+        # Agora que o campo 'priority' existe no banco, enviamos o dicionário de updates completo.
+        result = supabase.table("tasks").update(updates).eq("id", task_id).execute()
         
         if result.data:
             task = result.data[0]
