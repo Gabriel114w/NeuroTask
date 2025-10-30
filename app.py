@@ -121,7 +121,7 @@ THEMES = {
     "accent": "#81C784",
     "background": "#121212",
     "surface": "#1E272C",
-    "text": "#808080",
+    "text": "#FFFFFF",
     "text_secondary": "#B2DFDB",
     "success": "#66BB6A",
     "warning": "#FFD54F",
