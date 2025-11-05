@@ -70,7 +70,7 @@ THEMES = {
         "accent": "#81C784",
         "background": "#FAFAFA",
         "surface": "#FFFFFF",
-        "text": "#388E3C",
+        "text": "#2E7D32",
         "text_secondary": "#66BB6A",
         "success": "#A5D6A7", # Verde Suave (Baixa)
 
