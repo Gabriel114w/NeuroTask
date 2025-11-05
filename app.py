@@ -132,7 +132,7 @@ THEMES = {
 },
     "dark_brown": {
         "name": "Marrom Escuro (Acolhedor)",
-        "primary": "#824908",
+        "primary": "#99521C",
         "secondary": "#4E342E",
         "accent": "#FFAB40",
         "background": "#1A1A1A",
